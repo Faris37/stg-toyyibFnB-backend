@@ -1,6 +1,6 @@
 # ski-backend
 
-ski bakcend
+toyyibFnB Backend
 
 ## Getting started
 
