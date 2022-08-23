@@ -8,7 +8,8 @@ function getDateTime() {
 
 async function insertOrder(
     total,
-    order
+    order,
+    
 ) {
     let result = null;
 
@@ -19,6 +20,8 @@ async function insertOrder(
             orderDatetime: getDateTime(),
             orderAmount: total,
             orderDetail: JSON.stringify(order),
+            orderCustomerName: order.custName,
+            orderCustomerPhoneNo: order.custPhone
         });
 
         
@@ -74,9 +77,8 @@ async function getOrder(orderID) {
     let result = null;
   
     result = await knex.connect(`order`).select('orderDetail', 'orderAmount').where(`orderID`, orderID)
-  
-    console.log(result);
-  
+    
+
     return result;
   }
 

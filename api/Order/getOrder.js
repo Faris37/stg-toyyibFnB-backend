@@ -24,9 +24,13 @@ router.post("/", async (req, res) => {
         if (!getOrder) return;
 
         result = {
-            message: "Successfull List of Menu",
+            response: 200,
+            message: "Successfull List of Order",
             environment: process.env.ENVIRONMENT,
-            data: getOrder,
+            data: {
+                d3t4ilOrd3r: getOrder[0]['orderDetail'],
+                am0untOrd3r: getOrder[0]['orderAmount']
+            }
         };
     } catch (error) {
         console.log(error); // LOG ERROR
