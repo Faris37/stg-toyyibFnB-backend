@@ -16,8 +16,6 @@ router.post("/", async (req, res) => {
 
         mmberID = param.mmberID;
         
-        console.log(mmberID);
-
         let getMembership = await model.getMembership(
             mmberID
         )

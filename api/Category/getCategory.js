@@ -17,6 +17,7 @@ router.get("/", async (req, res) => {
     if (!getCategory) return;
 
     result = {
+      response:200,
       message: "Successfull List of Category",
       environment: process.env.ENVIRONMENT,
       data: getCategory,

@@ -9,7 +9,7 @@ router.post("/", async (req, res) => {
 
     let order = [];
     let total = null;
-    let discount = null;
+    
 
     try {
 
@@ -18,12 +18,10 @@ router.post("/", async (req, res) => {
 
         order = param.order;
         total = param.total;
-        discount = param.discounted;
 
         let insertOrder = await model.insertOrder(
             total,
-            order,
-            discount
+            order
         )
 
         let insertmenuOrder = await model.insertmenuOrder(
@@ -33,6 +31,7 @@ router.post("/", async (req, res) => {
 
         if (insertOrder != false || insertmenuOrder != false) {
             result = {
+                response: 200,
                 status: "berjaya",
                 message: "Anda berjaya masukkan Order.",
                 data: insertOrder

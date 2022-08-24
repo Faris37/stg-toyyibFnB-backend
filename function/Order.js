@@ -15,14 +15,17 @@ async function insertOrder(
 
     try {
 
-        let sql = await knex.connect('order').insert({
+        
+         let sql = await knex.connect('order').insert({
             orderStatusCode: "1",
             orderDatetime: getDateTime(),
             orderAmount: total,
             orderDetail: JSON.stringify(order),
-            orderCustomerName: order.custName,
-            orderCustomerPhoneNo: order.custPhone
-        });
+            orderCustomerName: order[0].custName,
+            orderCustomerPhoneNo: order[0].custPhone
+        }); 
+
+        
 
         
         if (!sql || sql.length == 0) {
@@ -56,8 +59,6 @@ async function insertmenuOrder(
                 fkMenud: order[i].id,
             });
         }
-
-        console.log("insertEjen: ", sql);
 
         if (!sql || sql.length == 0) {
             result = false;
