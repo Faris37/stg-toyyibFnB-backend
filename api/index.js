@@ -15,4 +15,7 @@ router.use('/tbl/getMembership', require("./Membership/getMembership.js"));
 // * * * * * * * *  LOGIN * * * * * * * * //
 router.use('/loginStaff', require("./LoginStaff/loginStaff.js"));
 
+// * * * * * * * *  TYPE ORDER * * * * * * * * //
+router.use('/getTypeOrder', require("./Reference/getTypeOrder.js"));
+
 module.exports = router;
