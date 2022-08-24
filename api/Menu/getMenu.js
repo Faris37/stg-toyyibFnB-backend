@@ -6,30 +6,37 @@ const model = require("../../function/Menu.js"); // INCLUDE FUNCTION FILE
 
 // GET USER
 router.get("/", async (req, res) => {
-  
   let result = null;
 
   try {
-
     // GET USER FUNCTION
     const getMenu = await model.getMenu();
 
-    if (!getMenu) return;
+    // if (!getMenu) return;
 
-    result = {
-      message: "Successfull List of Menu",
-      environment: process.env.ENVIRONMENT,
-      data: getMenu,
-    };
+    if (getMenu) {
+      result = {
+        status: 200,
+        message: "Successfull List of Menu",
+        environment: process.env.ENVIRONMENT,
+        data: getMenu,
+      };
+    } else {
+      result = {
+        status: 200,
+        message: "No data",
+      };
+    }
   } catch (error) {
     console.log(error); // LOG ERROR
     result = {
+      status: 500,
       message: `API Error`,
     };
   }
 
   // RETURN
-  res.status(200).json(result);
+  res.status(result.status).json(result);
 });
 
 module.exports = router;
