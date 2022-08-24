@@ -18,4 +18,7 @@ router.use('/loginStaff', require("./LoginStaff/loginStaff.js"));
 // * * * * * * * *  TYPE ORDER * * * * * * * * //
 router.use('/getTypeOrder', require("./Reference/getTypeOrder.js"));
 
+// * * * * * * * *  ORDER POS * * * * * * * * //
+router.use('/pos/insertOrder', require("./Order/insertOrderPOS.js"));
+
 module.exports = router;
