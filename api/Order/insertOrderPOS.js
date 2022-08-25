@@ -30,13 +30,12 @@ router.post("/", async (req, res) => {
       serviceCharge
     );
 
-    // let insertmenuOrder = await model.insertmenuOrderPOS();
+    let insertmenuOrder = await model.insertmenuOrderPOS(order, insertOrder);
 
-    if (insertOrder != false) {
+    if (insertOrder || insertmenuOrder != false) {
       result = {
         status: 200,
         message: "Success",
-        data: insertOrder,
       };
     } else {
       result = {
