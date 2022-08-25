@@ -9,10 +9,26 @@ async function insertOrder(total, order) {
   let result = null;
 
   try {
+    let sqlGetStatus = await knex
+    .connect("reference")
+    .select("referenceName", "referenceValue")
+    .where("referenceValue", 1)
+    .andWhere("referenceRefCode", 4);
+
+    var tax = total * 0.06;
+    var service = total * 0.1;
+    var totalAmount = total + tax + service;
+
+    let orderNo =  await generateOrderID(4).then((res) => {
+      return res;
+    });
+
     let sql = await knex.connect("order").insert({
-      orderStatusCode: "1",
+      orderNo: orderNo,
+      orderStatusCode: sqlGetStatus[0].referenceValue,
       orderDatetime: getDateTime(),
       orderAmount: total,
+      orderTotalAmount: totalAmount.toFixed(2),
       orderDetail: JSON.stringify(order),
       orderCustomerName: order[0].custName,
       orderCustomerPhoneNo: order[0].custPhone,
@@ -35,14 +51,22 @@ async function insertmenuOrder(order, insertOrder) {
 
   try {
     for (let i = 0; i < order.length; i++) {
+
+      let sqlGetStatus = await knex
+      .connect("reference")
+      .select("referenceName", "referenceValue")
+      .where("referenceValue", 3)
+      .andWhere("referenceRefCode", 4);
+
       let sql = await knex.connect("menu_order").insert({
         menuOrderQuantity: order[i].quantity,
-        menuOrderStatusCode: "4",
-        menuOrderStatusRefName: "In Cart",
+        menuOrderStatusCode: sqlGetStatus[0].referenceValue,
+        menuOrderStatusRefName: sqlGetStatus[0].referenceName,
         menuOrderPrice: order[i].price,
         menuOrderDetail: order[i],
         fkOrderId: insertOrder,
         fkMenud: order[i].id,
+        menuOrderTypeOrderRefCode: order[i].orderType,
       });
     }
 
