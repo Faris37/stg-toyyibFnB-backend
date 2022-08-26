@@ -21,4 +21,7 @@ router.use('/getTypeOrder', require("./Reference/getTypeOrder.js"));
 // * * * * * * * *  ORDER POS * * * * * * * * //
 router.use('/pos/insertOrder', require("./Order/insertOrderPOS.js"));
 
+// * * * * * * * *  PAYMENT ORDER POS * * * * * * * * //
+router.use('/pos/paymentOrder', require("./Payment/insertPaymentPOS.js"));
+
 module.exports = router;
