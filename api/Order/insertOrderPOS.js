@@ -23,11 +23,9 @@ router.post("/", async (req, res) => {
       amt,
       totalAmount,
       order,
-      1,
-      1,
-      discount,
-      tax,
-      serviceCharge
+      staffId,
+      counterId,
+      discount
     );
 
     let insertmenuOrder = await model.insertmenuOrderPOS(order, insertOrder);
@@ -36,6 +34,7 @@ router.post("/", async (req, res) => {
       result = {
         status: 200,
         message: "Success",
+        data: insertOrder,
       };
     } else {
       result = {
