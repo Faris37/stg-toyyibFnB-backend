@@ -66,9 +66,10 @@ async function insertmenuOrder(order, insertOrder) {
         fkOrderId: insertOrder,
         fkMenud: order[i].id,
         menuOrderTypeOrderRefCode: order[i].orderType,
+        menuOrderRemark: order[i].remarks,
       });
     }
-
+    
     if (!sql || sql.length == 0) {
       result = false;
     } else {

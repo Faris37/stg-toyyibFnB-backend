@@ -11,6 +11,9 @@ router.use('/tbl/insertOrder', require("./Order/insertOrder.js"));
 router.use('/tbl/getOrder', require("./Order/getOrder.js"));
 /* MEMBERSHIP */
 router.use('/tbl/getMembership', require("./Membership/getMembership.js"));
+/* PAYMENT */
+router.use('/tbl/tblorderPayment', require("./Payment/tblorderPayment.js"));
+router.use('/tbl/CallbackURLtbl', require("./Payment/tblorderCallbackURL.js"));
 
 
 // * * * * * * * *  LOGIN * * * * * * * * //
