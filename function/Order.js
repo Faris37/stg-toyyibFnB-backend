@@ -12,7 +12,7 @@ async function insertOrder(total, order) {
     let sqlGetStatus = await knex
       .connect("reference")
       .select("referenceName", "referenceValue")
-      .where("referenceValue", 1)
+      .where("referenceValue", 3)
       .andWhere("referenceRefCode", 4);
 
     var tax = total * 0.06;

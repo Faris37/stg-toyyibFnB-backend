@@ -80,6 +80,35 @@ async function insertPaymentPOS(
   return result;
 }
 
+async function tblorderPayment() {
+  let array = [];
+  array = {
+    'userSecretKey': 'w5x7srq7-rx5r-3t89-2ou2-k7361x2jewhn',
+    'categoryCode': '1to0s08q',
+    'billName': 'Order for',
+    'billDescription': 'Order for Table 1',
+    'billPriceSetting': 1,
+    'billPayorInfo': 1,
+    'billAmount': 100,
+    'billReturnUrl': 'http://bizapp.my',/* http://localhost:8080/order/confirm */
+    'billCallbackUrl': 'http://bizapp.my/paystatus', 
+    'billExternalReferenceNo': 'Order No',
+    'billTo': 'John Doe', /* Customer Name */
+    'billEmail': 'jd@gmail.com', /* Email cust */
+    'billPhone': '0194342411', /* Phone Cust */
+    'billSplitPayment': 0,
+    'billSplitPaymentArgs': '',
+    'billPaymentChannel': '0',
+    'billContentEmail': 'Thank you for purchasing our product!',
+    'billChargeToCustomer': 1,
+    'billExpiryDate': '',
+    'billExpiryDays': ''
+  }
+
+  /* Axios */
+}
+
 module.exports = {
   insertPaymentPOS,
+  tblorderPayment,
 };

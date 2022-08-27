@@ -5,10 +5,11 @@ const router = express.Router();
 /* CATEGORIES */
 router.use('/tbl/getCategory', require("./Category/getCategory.js"))
 /* MENU */
-router.use('/tbl/getMenu', require("./Menu/getMenu.js"));
+router.use('/getMenu', require("./Menu/getMenu.js"));
 /* ORDER */
-router.use('/insertOrder', require("./Order/insertOrder.js"));
-router.use('/getOrder', require("./Order/getOrder.js"));
+router.use('/tbl/insertOrder', require("./Order/insertOrder.js"));
+router.use('/tbl/getOrder', require("./Order/getOrder.js"));
+/* MEMBERSHIP */
 router.use('/tbl/getMembership', require("./Membership/getMembership.js"));
 
 
