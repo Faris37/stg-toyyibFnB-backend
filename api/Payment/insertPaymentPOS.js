@@ -1,6 +1,7 @@
 const express = require("express"); // MUST HAVE
 const router = express.Router(); // MUST HAVE
 const model = require("../../function/Payment"); // INCLUDE FUNCTION FILE
+const modelOrder = require("../../function/Order"); // INCLUDE FUNCTION FILE
 
 router.post("/", async (req, res) => {
   let param = null;
@@ -18,7 +19,11 @@ router.post("/", async (req, res) => {
     let customer = param.customer;
     let ccInvoiceNo = param.ccInvoiceNo;
     let order_no = param.order_no;
+    let order = param.order.order;
 
+    // order = JSON.parse(order.order);
+
+    console.log(order);
     let insertPayment = await model.insertPaymentPOS(
       amount,
       totalAmount,
@@ -30,11 +35,23 @@ router.post("/", async (req, res) => {
       order_no
     );
 
-    if (insertPayment != false) {
+    let updateOrder = await modelOrder.updateOrderPOS(
+      amount,
+      totalAmount,
+      order,
+      discount,
+      order_no,
+      'payment'
+    );
+
+    let updateMenuOrder = await modelOrder.updateMenuOrderPOS(order, updateOrder, 'payment');
+
+    // update order & menu order
+
+    if (insertPayment != false || updateOrder != false || updateMenuOrder != false) {
       result = {
         status: 200,
         message: "Success",
-        data: insertPayment,
       };
     } else {
       result = {

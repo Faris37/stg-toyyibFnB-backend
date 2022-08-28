@@ -17,18 +17,18 @@ router.post("/", async (req, res) => {
     let counter = param.counter;
     let discount = param.discount;
     let order_no = param.order_no;
+    let type = '';
 
     let updateOrder = await model.updateOrderPOS(
       amt,
       totalAmount,
       order,
-      staffId,
-      counter,
       discount,
-      order_no
+      order_no,
+      type
     );
 
-    let updateMenuOrder = await model.updateMenuOrderPOS(order, updateOrder);
+    let updateMenuOrder = await model.updateMenuOrderPOS(order, updateOrder, type);
 
     if (updateOrder || updateMenuOrder) {
       result = {
