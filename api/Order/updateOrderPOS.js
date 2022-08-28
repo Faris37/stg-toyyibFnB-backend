@@ -16,28 +16,30 @@ router.post("/", async (req, res) => {
     let tableId = param.tableId;
     let counter = param.counter;
     let discount = param.discount;
+    let order_no = param.order_no;
+    let type = '';
 
-    let insertOrder = await model.insertOrderPOS(
+    let updateOrder = await model.updateOrderPOS(
       amt,
       totalAmount,
       order,
-      staffId,
-      counter,
-      discount
+      discount,
+      order_no,
+      type
     );
 
-    let insertmenuOrder = await model.insertmenuOrderPOS(order, insertOrder);
+    let updateMenuOrder = await model.updateMenuOrderPOS(order, updateOrder, type);
 
-    if (insertOrder || insertmenuOrder != false) {
+    if (updateOrder || updateMenuOrder) {
       result = {
         status: 200,
-        message: "Success",
-        data: insertOrder,
+        message: "Success Update",
+        data: updateOrder,
       };
     } else {
       result = {
         status: 500,
-        message: "Failed",
+        message: "Failed Update",
       };
     }
   } catch (error) {
