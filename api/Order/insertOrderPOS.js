@@ -12,19 +12,17 @@ router.post("/", async (req, res) => {
     let order = param.order;
     let totalAmount = param.totalAmt;
     let amt = param.amt;
-    let staffId = param.staffId;
+    let staffId = param.staff;
     let tableId = param.tableId;
-    let counterId = param.counterId;
+    let counter = param.counter;
     let discount = param.discount;
-    let tax = param.tax;
-    let serviceCharge = param.serviceCharge;
 
     let insertOrder = await model.insertOrderPOS(
       amt,
       totalAmount,
       order,
       staffId,
-      counterId,
+      counter,
       discount
     );
 
