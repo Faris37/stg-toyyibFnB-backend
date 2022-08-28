@@ -13,10 +13,6 @@ async function generateInvoiceNo(orderId) {
   let strOrderId = String("00000" + orderId).slice(-5);
   let strRandomNo = String("0000" + randomNo).slice(-4);
 
-  console.log("randomNo", randomNo);
-  console.log("strOrderId", strOrderId);
-  console.log("strRandomNo", strRandomNo);
-
   result = "MG" + moment().format("YYMMDDHHmmss") + strOrderId + strRandomNo;
   return result;
 }
@@ -46,10 +42,6 @@ async function insertPaymentPOS(
       return res;
     }
   );
-
-  console.log("orderno", orderNo);
-  console.log("orderId", sqlGetOrderId[0].orderId);
-  console.log(invoiceNo);
 
   try {
     let sql = await knex.connect("transaction").insert({
