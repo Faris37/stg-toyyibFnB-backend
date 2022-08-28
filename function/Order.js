@@ -231,10 +231,9 @@ async function updateOrderPOS(
   amount,
   total_amount,
   order,
-  staff_id,
-  counter_key,
   discount,
-  order_no
+  order_no,
+  type
 ) {
   let result = null;
   let tax = amount * 0.06;
@@ -243,30 +242,18 @@ async function updateOrderPOS(
 
   let orderNo = order_no;
 
-  let sqlGetStatusCompleted = await knex
-    .connect("reference")
-    .select("referenceName", "referenceValue")
-    .where("referenceValue", 1)
-    .andWhere("referenceRefCode", 4);
-
   let sqlGetStatusInCart = await knex
     .connect("reference")
     .select("referenceName", "referenceValue")
     .where("referenceValue", 3)
     .andWhere("referenceRefCode", 4);
 
-  let sqlGetCounter = await knex
-    .connect("counter")
-    .select("counterId")
-    .where("counterSecretKey", counter_key)
-    .andWhere("counterStatusCode", 1);
-
   //   console.log(orderId);
   try {
     let sql = await knex
       .connect("order")
       .update({
-        orderStatusCode: sqlGetStatusInCart[0].referenceValue,
+        orderStatusCode: type == "payment" ? 1 : 3,
         orderDatetime: getDateTime(),
         orderAmount: amount,
         orderTotalAmount: totalAmount,
@@ -276,8 +263,6 @@ async function updateOrderPOS(
         orderDiscount: discount,
         orderTax: tax,
         orderServiceCharge: 0,
-        fkStaffId: staff_id,
-        fkCounterId: sqlGetCounter[0].counterId,
       })
       .where("orderNo", orderNo);
 
@@ -293,23 +278,26 @@ async function updateOrderPOS(
   return result;
 }
 
-async function updateMenuOrderPOS(order, orderNo) {
+async function updateMenuOrderPOS(order, orderNo, type) {
   let result = null;
   let sql = null;
   let sqlNotExist = null;
   let sqlCancel = null;
+  let sqlGetStatusOrder = null;
 
-  let sqlGetStatusCompleted = await knex
-    .connect("reference")
-    .select("referenceName", "referenceValue")
-    .where("referenceValue", 1)
-    .andWhere("referenceRefCode", 4);
-
-  let sqlGetStatusInCart = await knex
-    .connect("reference")
-    .select("referenceName", "referenceValue")
-    .where("referenceValue", 3)
-    .andWhere("referenceRefCode", 4);
+  if (type == "payment") {
+    sqlGetStatusOrder = await knex
+      .connect("reference")
+      .select("referenceName", "referenceValue")
+      .where("referenceValue", 1)
+      .andWhere("referenceRefCode", 4);
+  } else {
+    sqlGetStatusOrder = await knex
+      .connect("reference")
+      .select("referenceName", "referenceValue")
+      .where("referenceValue", 3)
+      .andWhere("referenceRefCode", 4);
+  }
 
   let sqlGetOrderId = await knex
     .connect("order")
@@ -341,7 +329,6 @@ async function updateMenuOrderPOS(order, orderNo) {
     });
   });
 
-  console.log("menuOrderExist", menuOrderExistCancel);
 
   try {
     if (menuOrderExistCancel.length > 0) {
@@ -350,7 +337,7 @@ async function updateMenuOrderPOS(order, orderNo) {
           .connect("menu_order")
           .update({
             menuOrderStatusCode: 4,
-            menuOrderStatusRefName: 'Cancelled',
+            menuOrderStatusRefName: "Cancelled",
           })
           .where("menuOrderId", menuOrderExistCancel[i].menuOrderId);
       }
@@ -362,8 +349,8 @@ async function updateMenuOrderPOS(order, orderNo) {
           .connect("menu_order")
           .update({
             menuOrderQuantity: orderExist[i].menu_quantity,
-            menuOrderStatusCode: sqlGetStatusInCart[0].referenceValue,
-            menuOrderStatusRefName: sqlGetStatusInCart[0].referenceName,
+            menuOrderStatusCode: sqlGetStatusOrder[0].referenceValue,
+            menuOrderStatusRefName: sqlGetStatusOrder[0].referenceName,
             menuOrderPrice: orderExist[i].menu_price,
             menuOrderDetail: JSON.stringify(orderExist[i]),
             // menuOrderTypeOrderRefCode: order[i].refOrderType,
@@ -379,8 +366,8 @@ async function updateMenuOrderPOS(order, orderNo) {
       for (let i = 0; i < orderNotExist.length; i++) {
         sqlNotExist = await knex.connect("menu_order").insert({
           menuOrderQuantity: orderNotExist[i].menu_quantity,
-          menuOrderStatusCode: sqlGetStatusInCart[0].referenceValue,
-          menuOrderStatusRefName: sqlGetStatusInCart[0].referenceName,
+          menuOrderStatusCode: sqlGetStatusOrder[0].referenceValue,
+          menuOrderStatusRefName: sqlGetStatusOrder[0].referenceName,
           menuOrderPrice: orderNotExist[i].menu_price,
           menuOrderDetail: JSON.stringify(orderNotExist[i]),
           // menuOrderTypeOrderRefCode: order[i].refOrderType,
