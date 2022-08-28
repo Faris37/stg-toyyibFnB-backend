@@ -10,6 +10,7 @@ router.use('/getMenu2', require("./Menu/getMenuPOS.js"));
 /* ORDER */
 router.use('/tbl/insertOrder', require("./Order/insertOrder.js"));
 router.use('/tbl/getOrder', require("./Order/getOrder.js"));
+router.use('/tbl/getOrderCart', require("./Order/getOrderCart.js"));
 /* MEMBERSHIP */
 router.use('/tbl/getMembership', require("./Membership/getMembership.js"));
 /* PAYMENT */

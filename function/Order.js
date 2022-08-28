@@ -94,6 +94,17 @@ async function getOrder(orderID) {
   return result;
 }
 
+async function getOrderCart(orderid) {
+  let result = null;
+
+  result = await knex
+    .connect(`order`)
+    .select("orderDetail as order_details" , "orderAmount as order_amount")
+    .where(`orderID`, orderid);
+
+  return result;
+}
+
 async function generateOrderID(length) {
   let result1 = "";
   let result2 = "";
@@ -401,4 +412,5 @@ module.exports = {
   insertmenuOrderPOS,
   updateOrderPOS,
   updateMenuOrderPOS,
+  getOrderCart,
 };
