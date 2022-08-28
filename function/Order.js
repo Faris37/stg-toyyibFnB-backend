@@ -64,10 +64,11 @@ async function insertmenuOrder(order, insertOrder) {
         menuOrderPrice: order[i].price,
         menuOrderDetail: order[i],
         fkOrderId: insertOrder,
-        fkMenud: order[i].id,
+        fkMenuId: order[i].id,
         menuOrderTypeOrderRefCode: order[i].orderType,
         menuOrderRemark: order[i].remarks,
       });
+      console.log('Insert Menu Order: ',sql)
     }
     
     if (!sql || sql.length == 0) {

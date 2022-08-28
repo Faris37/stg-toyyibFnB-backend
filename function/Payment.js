@@ -124,7 +124,7 @@ async function createBill(){
   params.append('billPayorInfo', 1);
   params.append('billAmount', 100);
   params.append('billReturnUrl', 'http://bizapp.my');
-  params.append('billCallbackUrl', 'http://bizapp.my/paystatus');
+  params.append('billCallbackUrl', 'https://toyyibfnb.com/api/tbl/tblorderCallbackURL');
   params.append('billExternalReferenceNo', 'Order No 01234');
   params.append('billTo', 'Faris Izwan');
   params.append('billEmail', 'Farisizwanfauzi@gmail.com');
