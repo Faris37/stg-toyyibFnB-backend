@@ -9,6 +9,7 @@ router.post("/", parseMultiPart, async (req, res) => {
   let param = null;
   let result = null;
 
+  let logText = null;
   let refno = null;
   let status = null;
   let reason = null;
@@ -29,7 +30,9 @@ router.post("/", parseMultiPart, async (req, res) => {
     amount = req.formData[5].data.toString();
     transaction_time = req.formData[11].data.toString();
 
-    logger.info();
+    logText = `refno: ${refno}, status: ${status}, reason: ${reason}, billcode: ${billcode}, order_id: ${order_id}, amount: ${amount}, transaction_time: ${transaction_time}`;
+
+    logger.info(logText);
 
     // console.log("req", req.body);
     console.log("refno", refno);
