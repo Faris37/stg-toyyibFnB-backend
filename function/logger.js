@@ -4,7 +4,7 @@ const moment = require("moment");
 const customFormat = format.combine(
     format.timestamp(),
     format.printf(info => {
-        return `moment().format('DD-MM-YYYY') ` +`: ${info.message}`;
+        return moment().format('DD-MM-YYYY') +`: ${info.message}`;
     }),
 );
 
