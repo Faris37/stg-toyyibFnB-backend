@@ -127,7 +127,7 @@ async function createBill(){
 
   console.log(params);
 
-  await axios.post(process.env.CREATE_BILL, params)
+  await axios.post('https://dev.toyyibpay.com/index.php/api/createBill', params)
   .then(function (response) {
       console.log(response.data)
       result = response.data[0].BillCode
