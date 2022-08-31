@@ -2,6 +2,7 @@ const express = require("express"); // MUST HAVE
 const router = express.Router(); // MUST HAVE
 const { Console } = require("console");
 const fs = require("fs");
+const logger = require("../../function/logger");
 
 router.post("/", async (req, res) => {
   let param = null;
@@ -27,24 +28,23 @@ router.post("/", async (req, res) => {
     amount = param.amount;
     transaction_time = param.transaction_time;
 
-    fs.appendFile("../../log/callback.txt", param, function (err) {
-      if (err) throw err;
-      console.log("Saved!");
-    });
+   
+    logger.info( "refno: " + refno + " status: " + status + " reason: " + reason + " billcode: " + billcode + " order_id: " + order_id + " amount: " + amount + " transaction_time: " + transaction_time);
 
+    console.log("param");
     result = {
-      response: 200,
-      status: "berjaya",
-      message: "Callback Berjaya.",
-      data: param,
+      status: 200,
+      message: "Success",
+      //   data: param,
     };
   } catch (error) {
     console.log(error); // LOG ERROR
     result = {
+      status: 500,
       message: `API Error`,
     };
   }
-  res.status(200).json(result);
+  res.status(result.status).json(result);
 });
 
 module.exports = router;
