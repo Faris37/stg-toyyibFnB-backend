@@ -1,5 +1,7 @@
 const express = require("express"); // MUST HAVE
 const router = express.Router(); // MUST HAVE
+const { Console } = require("console");
+const fs = require("fs");
 
 
 router.post("/", async (req, res) => {
@@ -29,6 +31,8 @@ router.post("/", async (req, res) => {
         amount = param.amount;
         transaction_time = param.transaction_time;
 
+        fs.appendFile('callback.txt', param);
+        
         result = {
             response: 200,
             status: "berjaya",
