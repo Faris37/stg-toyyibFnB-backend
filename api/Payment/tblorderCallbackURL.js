@@ -29,8 +29,9 @@ router.post("/", async (req, res) => {
     transaction_time = param.transaction_time;
 
    
-    logger.info( "refno: " + refno + " status: " + status + " reason: " + reason + " billcode: " + billcode + " order_id: " + order_id + " amount: " + amount + " transaction_time: " + transaction_time);
+    logger.info( "refno: " + refno + ", status: " + status + ", reason: " + reason + ", billcode: " + billcode + ", order_id: " + order_id + ", amount: " + amount + ", transaction_time: " + transaction_time);
 
+    console.log('res', res)
     console.log("param");
     result = {
       status: 200,
