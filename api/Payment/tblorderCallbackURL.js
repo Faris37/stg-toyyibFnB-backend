@@ -28,11 +28,10 @@ router.post("/", async (req, res) => {
     amount = param.amount;
     transaction_time = param.transaction_time;
 
-   
-    logger.info( "refno: " + refno + ", status: " + status + ", reason: " + reason + ", billcode: " + billcode + ", order_id: " + order_id + ", amount: " + amount + ", transaction_time: " + transaction_time);
+    logger.info(param);
 
-    console.log('res', res)
-    console.log("param");
+    // console.log('', param)
+    console.log("param", param);
     result = {
       status: 200,
       message: "Success",
