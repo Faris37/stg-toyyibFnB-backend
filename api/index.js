@@ -6,7 +6,6 @@ const router = express.Router();
 router.use('/tbl/getCategory', require("./Category/getCategory.js"))
 /* MENU */
 router.use('/getMenu', require("./Menu/getMenu.js"));
-router.use('/getMenu2', require("./Menu/getMenuPOS.js"));
 /* ORDER */
 router.use('/tbl/insertOrder', require("./Order/insertOrder.js"));
 router.use('/tbl/getOrder', require("./Order/getOrder.js"));
