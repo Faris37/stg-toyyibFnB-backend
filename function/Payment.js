@@ -51,6 +51,7 @@ async function insertPaymentPOS(
       transactionAmount: totalAmount,
       transactionAmountNett: totalAmount,
       transactionMethodCode: paymentMethod,
+      transactionCardInvoiceNo: ccInvoiceNo != null ? ccInvoiceNo : null,
       transactionServiceCharge: service,
       transactionDiscount: discount,
       transactionTax: tax,
