@@ -5,7 +5,7 @@ const model = require("../../function/Payment.js"); // INCLUDE FUNCTION FILE
 // MAKE SURE METHOD IS CORRECT WHEN CALLING API
 
 // GET USER
-router.get("/", async (req, res) => {
+router.post("/", async (req, res) => {
     let result = null;
 
     try {
