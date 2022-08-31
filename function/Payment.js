@@ -117,7 +117,7 @@ async function createBill(){
   params.append('billPayorInfo', 1);
   params.append('billAmount', 100);
   // params.append('billReturnUrl', 'http://bizapp.my');
-  params.append('billCallbackUrl', 'https://webhook.site/5b40546b-ff1f-4713-b6d5-7ebefeaec9f6');
+  params.append('billCallbackUrl', 'https://toyyibfnb.com/api/tbl/callbackPayment');
   params.append('billExternalReferenceNo', 'Order No 01234');
   params.append('billTo', 'test');
   params.append('billEmail', 'hishamudin.ali@gmail.com');
