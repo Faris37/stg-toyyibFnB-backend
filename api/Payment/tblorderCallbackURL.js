@@ -3,8 +3,9 @@ const router = express.Router(); // MUST HAVE
 const { Console } = require("console");
 const fs = require("fs");
 const logger = require("../../function/logger");
+const parseMultiPart = require("express-parse-multipart");
 
-router.post("/", async (req, res) => {
+router.post("/", parseMultiPart, async (req, res) => {
   let param = null;
   let result = null;
 
@@ -20,18 +21,18 @@ router.post("/", async (req, res) => {
     // BIND PARAMETER TO VARIABLES
     param = req.body;
 
-    refno = param.refno;
-    status = param.status;
-    reason = param.reason;
-    billcode = param.billcode;
-    order_id = param.order_id;
-    amount = param.amount;
-    transaction_time = param.transaction_time;
+    refno = req.formData[0].data.toString();
+    status = req.formData[1].data.toString();
+    reason = req.formData[2].data.toString();
+    billcode = req.formData[3].data.toString();
+    order_id = req.formData[4].data.toString();
+    amount = req.formData[5].data.toString();
+    transaction_time = req.formData[11].data.toString();
 
-    logger.info( res.json(param));
+    logger.info();
 
-    console.log('req', req.body)
-    console.log("refno", req.body.refno);
+    // console.log("req", req.body);
+    console.log("refno", refno);
     result = {
       status: 200,
       message: "Success",

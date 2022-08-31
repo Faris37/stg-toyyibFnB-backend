@@ -614,6 +614,11 @@
   dependencies:
     "busboy" "^1.6.0"
 
+"express-parse-multipart@^1.1.2":
+  "integrity" "sha512-B4ck2vrXqOzxGt24xFPDDCFQ+hsGzqLgbWBboAjk7zhqs3ghvWNt2FCRQ5eYmgCxy9CN3KCRzq2XVO9v5Ez6bg=="
+  "resolved" "https://registry.npmjs.org/express-parse-multipart/-/express-parse-multipart-1.1.2.tgz"
+  "version" "1.1.2"
+
 "express@^4.17.3":
   "integrity" "sha512-yuSQpz5I+Ch7gFrPCk4/c+dIBKlQUxtgwqzph132bsT6qhuzss6I8cLJQz7B3rFblzd6wtcI0ZbGltH/C4LjUg=="
   "resolved" "https://registry.npmjs.org/express/-/express-4.17.3.tgz"
