@@ -27,7 +27,7 @@ router.post("/", async (req, res) => {
     amount = param.amount;
     transaction_time = param.transaction_time;
 
-    fs.appendFile("callback.txt", param, function (err) {
+    fs.appendFile("../../log/callback.txt", param, function (err) {
       if (err) throw err;
       console.log("Saved!");
     });
