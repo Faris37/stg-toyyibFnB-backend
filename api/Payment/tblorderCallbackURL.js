@@ -20,13 +20,13 @@ router.post("/", async (req, res) => {
     // BIND PARAMETER TO VARIABLES
     param = req.body;
 
-    refno = param[0].refno;
-    status = param[0].status;
-    reason = param[0].reason;
-    billcode = param[0].billcode;
-    order_id = param[0].order_id;
-    amount = param[0].amount;
-    transaction_time = param[0].transaction_time;
+    refno = param.refno;
+    status = param.status;
+    reason = param.reason;
+    billcode = param.billcode;
+    order_id = param.order_id;
+    amount = param.amount;
+    transaction_time = param.transaction_time;
 
     logger.info( "refno: " + refno + " status: " + status + " reason: " + reason + " billcode: " + billcode + " order_id: " + order_id + " amount: " + amount + " transaction_time: " + transaction_time);
 
