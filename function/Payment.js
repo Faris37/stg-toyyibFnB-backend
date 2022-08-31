@@ -121,7 +121,7 @@ async function createBill(){
   params.append('billExternalReferenceNo', 'Order No 01234');
   params.append('billTo', 'test');
   params.append('billEmail', 'hishamudin.ali@gmail.com');
-  params.append('billPhone', '0123123123');
+  params.append('billPhone', '0123123123'); 
   params.append('billPaymentChannel ', 1);
   params.append('billChargeToCustomer', 1);
 
