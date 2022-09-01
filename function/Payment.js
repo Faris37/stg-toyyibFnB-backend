@@ -51,6 +51,7 @@ async function insertPaymentPOS(
       transactionAmount: totalAmount,
       transactionAmountNett: totalAmount,
       transactionMethodCode: paymentMethod,
+      transactionCardInvoiceNo: ccInvoiceNo != null ? ccInvoiceNo : null,
       transactionServiceCharge: service,
       transactionDiscount: discount,
       transactionTax: tax,
@@ -114,6 +115,7 @@ async function createBill(billName, billDesc,  billAmount,  billExternalReferenc
   params.append('billDescription', billDesc);
   params.append('billPriceSetting', 1);
   params.append('billPayorInfo', 1);
+<<<<<<< HEAD
   params.append('billAmount', billAmount);
   params.append('billReturnUrl', 'http://localhost:8080/order/confirm');
   params.append('billCallbackUrl', 'https://toyyibfnb.com/api/tbl/tblorderCallbackURL');
@@ -121,13 +123,27 @@ async function createBill(billName, billDesc,  billAmount,  billExternalReferenc
   params.append('billTo', billTo);
   params.append('billEmail', 'Farisizwanfauzi@gmail.com');
   params.append('billPhone', billPhone);
+=======
+  params.append('billAmount', 100);
+  // params.append('billReturnUrl', 'http://bizapp.my');
+  params.append('billCallbackUrl', 'https://toyyibfnb.com/api/tbl/callbackPayment');
+  params.append('billExternalReferenceNo', 'Order No 01234');
+  params.append('billTo', 'test');
+  params.append('billEmail', 'hishamudin.ali@gmail.com');
+  params.append('billPhone', '0123123123'); 
+>>>>>>> 467cc83b53342f7d0f0d3fe52851b04753f24b9b
   params.append('billPaymentChannel ', 1);
   params.append('billChargeToCustomer', 1);
 
   console.log(params);
 
+<<<<<<< HEAD
   await axios.post(process.env.CREATE_BILL, params)
     .then(function (response) {
+=======
+  await axios.post('https://dev.toyyibpay.com/index.php/api/createBill', params)
+  .then(function (response) {
+>>>>>>> 467cc83b53342f7d0f0d3fe52851b04753f24b9b
       console.log(response.data)
       result = response.data[0].BillCode
     })

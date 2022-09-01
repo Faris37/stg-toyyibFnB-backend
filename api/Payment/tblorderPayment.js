@@ -6,7 +6,10 @@ const model = require("../../function/Payment.js"); // INCLUDE FUNCTION FILE
 
 // GET USER
 router.post("/", async (req, res) => {
+<<<<<<< HEAD
     let param = null;
+=======
+>>>>>>> 467cc83b53342f7d0f0d3fe52851b04753f24b9b
     let result = null;
     let billName = null;
     let billDesc = null;

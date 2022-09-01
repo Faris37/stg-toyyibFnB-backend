@@ -6,7 +6,6 @@ const router = express.Router();
 router.use('/tbl/getCategory', require("./Category/getCategory.js"))
 /* MENU */
 router.use('/getMenu', require("./Menu/getMenu.js"));
-router.use('/getMenu2', require("./Menu/getMenuPOS.js"));
 /* ORDER */
 router.use('/tbl/insertOrder', require("./Order/insertOrder.js"));
 router.use('/tbl/getOrder', require("./Order/getOrder.js"));
@@ -15,7 +14,7 @@ router.use('/tbl/getOrderCart', require("./Order/getOrderCart.js"));
 router.use('/tbl/getMembership', require("./Membership/getMembership.js"));
 /* PAYMENT */
 router.use('/tbl/tblorderPayment', require("./Payment/tblorderPayment.js"));
-router.use('/tbl/CallbackURLtbl', require("./Payment/tblorderCallbackURL.js"));
+router.use('/tbl/callbackPayment', require("./Payment/tblorderCallbackURL.js"));
 
 
 // * * * * * * * *  LOGIN * * * * * * * * //

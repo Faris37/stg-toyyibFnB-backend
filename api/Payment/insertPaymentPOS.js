@@ -17,7 +17,7 @@ router.post("/", async (req, res) => {
     let serviceCharge = param.serviceCharge;
     let paymentMethod = param.payment_method;
     let customer = param.customer;
-    let ccInvoiceNo = param.ccInvoiceNo;
+    let ccInvoiceNo = param.cc_invoiceNo;
     let order_no = param.order_no;
     let order = param.order.order;
 
