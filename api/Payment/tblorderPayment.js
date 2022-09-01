@@ -5,12 +5,42 @@ const model = require("../../function/Payment.js"); // INCLUDE FUNCTION FILE
 // MAKE SURE METHOD IS CORRECT WHEN CALLING API
 
 // GET USER
-router.get("/", async (req, res) => {
+router.post("/", async (req, res) => {
+    let param = null;
     let result = null;
+    let billName = null;
+    let billDesc = null;
+    let billAmount = null;
+    let billExternalReferenceNo = null;
+    let billTo = null;
+    let billPhone = null;
 
     try {
         // GET USER FUNCTION
-        const createBill = await model.createBill();
+        param = req.body;
+
+        billName = param.billName;
+        billDesc = param.billDesc;
+        billAmount = param.billAmount;
+        billExternalReferenceNo = param.billExternalReferenceNo;
+        billTo = param.billTo;
+        billPhone = param.billPhone;
+
+        console.log("BIll Name: ",billName )
+        console.log("billDesc: ",billDesc )
+        console.log("billAmount: ",billAmount )
+        console.log("billExternalReferenceNo: ",billExternalReferenceNo )
+        console.log("billTo: ",billTo )
+        console.log("billPhone: ",billPhone )
+
+        const createBill = await model.createBill(
+            billName,
+            billDesc,
+            billAmount,
+            billExternalReferenceNo,
+            billTo,
+            billPhone,
+        );
 
         if (!createBill) return;
 

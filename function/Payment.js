@@ -84,7 +84,7 @@ async function tblorderPayment() {
     'billPayorInfo': 1,
     'billAmount': 100,
     'billReturnUrl': 'http://bizapp.my',/* http://localhost:8080/order/confirm */
-    'billCallbackUrl': 'http://bizapp.my/paystatus', 
+    'billCallbackUrl': 'http://bizapp.my/paystatus',
     'billExternalReferenceNo': 'Order No',
     'billTo': 'John Doe', /* Customer Name */
     'billEmail': 'jd@gmail.com', /* Email cust */
@@ -101,7 +101,7 @@ async function tblorderPayment() {
   /* Axios */
 }
 
-async function createBill(){
+async function createBill(billName, billDesc,  billAmount,  billExternalReferenceNo,  billTo,  billPhone,) {
 
   let result = [];
 
@@ -110,31 +110,31 @@ async function createBill(){
   // required data
   params.append('userSecretKey', '3n8xhu0t-6tf8-s3pm-s3hc-3lx68vnj32jc');
   params.append('categoryCode', '1to0s08q');
-  params.append('billName', 'Order For Table 1');
-  params.append('billDescription', 'Order For Table 1 Faris');
+  params.append('billName', billName);
+  params.append('billDescription', billDesc);
   params.append('billPriceSetting', 1);
   params.append('billPayorInfo', 1);
-  params.append('billAmount', 100);
-  params.append('billReturnUrl', 'http://bizapp.my');
+  params.append('billAmount', billAmount);
+  params.append('billReturnUrl', 'http://localhost:8080/order/confirm');
   params.append('billCallbackUrl', 'https://toyyibfnb.com/api/tbl/tblorderCallbackURL');
-  params.append('billExternalReferenceNo', 'Order No 01234');
-  params.append('billTo', 'Faris Izwan');
+  params.append('billExternalReferenceNo', billExternalReferenceNo);
+  params.append('billTo', billTo);
   params.append('billEmail', 'Farisizwanfauzi@gmail.com');
-  params.append('billPhone', '0174842981');
+  params.append('billPhone', billPhone);
   params.append('billPaymentChannel ', 1);
   params.append('billChargeToCustomer', 1);
 
   console.log(params);
 
   await axios.post(process.env.CREATE_BILL, params)
-  .then(function (response) {
+    .then(function (response) {
       console.log(response.data)
       result = response.data[0].BillCode
-  })
-  .catch(function (error) {
+    })
+    .catch(function (error) {
       result = error
       console.log(error)
-  });
+    });
   return result;
 }
 
