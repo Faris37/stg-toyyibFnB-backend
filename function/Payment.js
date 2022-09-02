@@ -102,7 +102,7 @@ async function tblorderPayment() {
   /* Axios */
 }
 
-async function createBill(billName, billDesc,  billAmount,  billExternalReferenceNo,  billTo,  billPhone,) {
+async function createBill(billName, billDesc, billAmount, billExternalReferenceNo, billTo, billPhone, orderNo) {
 
   let result = [];
 
@@ -114,8 +114,8 @@ async function createBill(billName, billDesc,  billAmount,  billExternalReferenc
   params.append('billName', billName);
   params.append('billDescription', billDesc);
   params.append('billPriceSetting', 1);
-  params.append('billPayorInfo', 1);
-<<<<<<< HEAD
+  params.append('billPayorInfo', 0);
+
   params.append('billAmount', billAmount);
   params.append('billReturnUrl', 'http://localhost:8080/order/confirm');
   params.append('billCallbackUrl', 'https://toyyibfnb.com/api/tbl/tblorderCallbackURL');
@@ -123,27 +123,27 @@ async function createBill(billName, billDesc,  billAmount,  billExternalReferenc
   params.append('billTo', billTo);
   params.append('billEmail', 'Farisizwanfauzi@gmail.com');
   params.append('billPhone', billPhone);
-=======
-  params.append('billAmount', 100);
+
+  params.append('billAmount', billAmount);
   // params.append('billReturnUrl', 'http://bizapp.my');
   params.append('billCallbackUrl', 'https://toyyibfnb.com/api/tbl/callbackPayment');
   params.append('billExternalReferenceNo', 'Order No 01234');
   params.append('billTo', 'test');
   params.append('billEmail', 'hishamudin.ali@gmail.com');
-  params.append('billPhone', '0123123123'); 
->>>>>>> 467cc83b53342f7d0f0d3fe52851b04753f24b9b
+  params.append('billPhone', '0123123123');
+
   params.append('billPaymentChannel ', 1);
   params.append('billChargeToCustomer', 1);
 
   console.log(params);
 
-<<<<<<< HEAD
-  await axios.post(process.env.CREATE_BILL, params)
-    .then(function (response) {
-=======
+
+  /* await axios.post(process.env.CREATE_BILL, params)
+    .then(function (response) { */
+
   await axios.post('https://dev.toyyibpay.com/index.php/api/createBill', params)
-  .then(function (response) {
->>>>>>> 467cc83b53342f7d0f0d3fe52851b04753f24b9b
+    .then(function (response) {
+
       console.log(response.data)
       result = response.data[0].BillCode
     })
@@ -151,11 +151,52 @@ async function createBill(billName, billDesc,  billAmount,  billExternalReferenc
       result = error
       console.log(error)
     });
+
+  /* MASUK DLM TABLE TRANSACTION */
+  let sqlGetOrderId = knex
+    .connect("order")
+    .select("orderId")
+    .where("orderNo", orderNo);
+
+  let invoiceNo = generateInvoiceNo(sqlGetOrderId[0].orderId).then(
+    (res) => {
+      return res;
+    }
+  );
+
+  try {
+    let sql = await knex.connect("transaction").insert({
+      transactionInvoiceNo: invoiceNo,
+      transactionDatetime: getDateTime(),
+      transactionStatusCode: 2,
+      transactionAmount: billAmount,
+      transactionAmountNett: billAmount,
+      /* transactionServiceCharge: service,
+      transactionDiscount: discount,
+      transactionTax: tax, */
+      paymentStatus: 1,
+      transactionPayorName: "Customer Name",
+      transactionPayorPhoneNo: "Customer Phone",
+      fkOrderId: sqlGetOrderId[0].orderId
+    });
+
+    if (!sql || sql.length == 0) {
+      resu = false;
+    } else {
+      resu = sql[0];
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
   return result;
+
+  /* }) */
 }
+
 
 module.exports = {
   insertPaymentPOS,
   tblorderPayment,
-  createBill,
+  createBill
 };

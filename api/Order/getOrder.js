@@ -15,6 +15,7 @@ router.post("/", async (req, res) => {
         param = req.body;
 
         orderID = param.iOrder;
+        console.log(orderID)
 
         // GET USER FUNCTION
         const getOrder = await model.getOrder(
@@ -29,7 +30,8 @@ router.post("/", async (req, res) => {
             environment: process.env.ENVIRONMENT,
             data: {
                 d3t4ilOrd3r: getOrder[0]['orderDetail'],
-                am0untOrd3r: getOrder[0]['orderAmount']
+                am0untOrd3r: getOrder[0]['orderAmount'],
+                order_no: getOrder[0]['orderNo']
             }
         };
     } catch (error) {

@@ -6,10 +6,9 @@ const model = require("../../function/Payment.js"); // INCLUDE FUNCTION FILE
 
 // GET USER
 router.post("/", async (req, res) => {
-<<<<<<< HEAD
+
     let param = null;
-=======
->>>>>>> 467cc83b53342f7d0f0d3fe52851b04753f24b9b
+
     let result = null;
     let billName = null;
     let billDesc = null;
@@ -17,6 +16,7 @@ router.post("/", async (req, res) => {
     let billExternalReferenceNo = null;
     let billTo = null;
     let billPhone = null;
+    let orderNo = null;
 
     try {
         // GET USER FUNCTION
@@ -28,6 +28,7 @@ router.post("/", async (req, res) => {
         billExternalReferenceNo = param.billExternalReferenceNo;
         billTo = param.billTo;
         billPhone = param.billPhone;
+        orderNo = param.orderNo;
 
         console.log("BIll Name: ",billName )
         console.log("billDesc: ",billDesc )
@@ -43,6 +44,7 @@ router.post("/", async (req, res) => {
             billExternalReferenceNo,
             billTo,
             billPhone,
+            orderNo,
         );
 
         if (!createBill) return;

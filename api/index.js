@@ -8,6 +8,7 @@ router.use('/tbl/getCategory', require("./Category/getCategory.js"))
 router.use('/getMenu', require("./Menu/getMenu.js"));
 /* ORDER */
 router.use('/tbl/insertOrder', require("./Order/insertOrder.js"));
+router.use('/tbl/updateOrdertbl', require("./Order/updateOrdertbl.js"));
 router.use('/tbl/getOrder', require("./Order/getOrder.js"));
 router.use('/tbl/getOrderCart', require("./Order/getOrderCart.js"));
 /* MEMBERSHIP */
