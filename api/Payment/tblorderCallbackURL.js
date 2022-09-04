@@ -4,6 +4,7 @@ const { Console } = require("console");
 const fs = require("fs");
 const logger = require("../../function/logger");
 const parseMultiPart = require("express-parse-multipart");
+const model = require("../../function/Payment.js");
 
 router.post("/", parseMultiPart, async (req, res) => {
   let param = null;
@@ -34,12 +35,20 @@ router.post("/", parseMultiPart, async (req, res) => {
 
     logger.info(logText);
 
+    /* UPDATE SINI  */
+
+    let updatePaymentTable = await model.updatePaymentTable(
+      billcode,
+      status
+    );
+
+    /* UPDATE */
     // console.log("req", req.body);
     console.log("refno", refno);
     result = {
       status: 200,
       message: "Success",
-      //   data: param,
+      data: updatePaymentTable,
     };
   } catch (error) {
     console.log(error); // LOG ERROR

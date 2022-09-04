@@ -32,6 +32,7 @@ async function insertOrder(total, order) {
       orderDetail: JSON.stringify(order),
       orderCustomerName: order[0].custName,
       orderCustomerPhoneNo: order[0].custPhone,
+      fkCounterId: 1,
     });
 
     if (!sql || sql.length == 0) {
@@ -95,13 +96,13 @@ async function updateOrdertbl(total, order, orderID) {
     console.log("tax :", tax)
     console.log("service :", service)
     console.log("totalAmount :", totalAmount)
-    
+
     let sql = await knex.connect("order").update({
       orderDatetime: getDateTime(),
       orderAmount: total,
       orderTotalAmount: totalAmount,
       orderDetail: JSON.stringify(order),
-    }).where("orderId", orderID);;
+    }).where("orderId", orderID);
 
     if (!sql || sql.length == 0) {
       result = false;
@@ -168,7 +169,7 @@ async function getOrder(orderID) {
 
   result = await knex
     .connect(`order`)
-    .select("orderDetail", "orderAmount" , "orderNo")
+    .select("orderDetail", "orderAmount", "orderNo")
     .where(`orderID`, orderID);
 
   return result;
@@ -181,6 +182,17 @@ async function getOrderCart(orderid) {
     .connect(`order`)
     .select("orderDetail as order_details", "orderAmount as order_amount")
     .where(`orderID`, orderid);
+
+  return result;
+}
+
+async function getOrderConfirm(billCode) {
+  let result = null;
+
+  result = await knex.connect('order')
+  .select('orderDetail as order_detail', 'orderTotalAmount as ordertotal_amount' , 'orderNo as order_no')
+  .join('transaction', 'order.orderId', '=', 'transaction.fkOrderID')
+  .where('transaction.tpBillCode',billCode)
 
   return result;
 }
@@ -495,4 +507,5 @@ module.exports = {
   updateOrderPOS,
   updateMenuOrderPOS,
   getOrderCart,
+  getOrderConfirm,
 };

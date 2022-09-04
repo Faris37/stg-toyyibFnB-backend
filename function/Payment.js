@@ -109,7 +109,7 @@ async function createBill(billName, billDesc, billAmount, billExternalReferenceN
   const params = new URLSearchParams();
 
   // required data
-  params.append('userSecretKey', '3n8xhu0t-6tf8-s3pm-s3hc-3lx68vnj32jc');
+  params.append('userSecretKey', '3n8xhu0t-6tf8-s3pm-s3hc-3lx68vnj32jc'); /* LETAK ENV */
   params.append('categoryCode', '1to0s08q');
   params.append('billName', billName);
   params.append('billDescription', billDesc);
@@ -118,16 +118,15 @@ async function createBill(billName, billDesc, billAmount, billExternalReferenceN
 
   params.append('billAmount', billAmount);
   params.append('billReturnUrl', 'http://localhost:8080/order/confirm');
-  params.append('billCallbackUrl', 'https://toyyibfnb.com/api/tbl/tblorderCallbackURL');
-  params.append('billExternalReferenceNo', billExternalReferenceNo);
+  params.append('billCallbackUrl', 'https://toyyibfnb.com/api/tbl/tblorderCallbackURL');/* https://toyyibfnb.com/api/tbl/tblorderCallbackURL */
+  params.append('billExternalReferenceNo', orderNo); /* Order No ORDER */
   params.append('billTo', billTo);
   params.append('billEmail', 'Farisizwanfauzi@gmail.com');
   params.append('billPhone', billPhone);
 
-  params.append('billAmount', billAmount);
+  /* params.append('billAmount', billAmount); */
   // params.append('billReturnUrl', 'http://bizapp.my');
-  params.append('billCallbackUrl', 'https://toyyibfnb.com/api/tbl/callbackPayment');
-  params.append('billExternalReferenceNo', 'Order No 01234');
+  /* params.append('billCallbackUrl', 'http://localhost:3000/tbl/callbackPayment'); */
   params.append('billTo', 'test');
   params.append('billEmail', 'hishamudin.ali@gmail.com');
   params.append('billPhone', '0123123123');
@@ -137,7 +136,7 @@ async function createBill(billName, billDesc, billAmount, billExternalReferenceN
 
   console.log(params);
 
-
+  /* returnURL receipt */
   /* await axios.post(process.env.CREATE_BILL, params)
     .then(function (response) { */
 
@@ -153,12 +152,13 @@ async function createBill(billName, billDesc, billAmount, billExternalReferenceN
     });
 
   /* MASUK DLM TABLE TRANSACTION */
-  let sqlGetOrderId = knex
+  let sqlGetOrderId = await knex
     .connect("order")
-    .select("orderId")
+    .select("orderId", "orderTotalAmount")
     .where("orderNo", orderNo);
 
-  let invoiceNo = generateInvoiceNo(sqlGetOrderId[0].orderId).then(
+
+  let invoiceNo = await generateInvoiceNo(sqlGetOrderId[0].orderId).then(
     (res) => {
       return res;
     }
@@ -169,8 +169,9 @@ async function createBill(billName, billDesc, billAmount, billExternalReferenceN
       transactionInvoiceNo: invoiceNo,
       transactionDatetime: getDateTime(),
       transactionStatusCode: 2,
-      transactionAmount: billAmount,
-      transactionAmountNett: billAmount,
+      transactionAmount: sqlGetOrderId[0].orderTotalAmount,
+      transactionAmountNett: sqlGetOrderId[0].orderTotalAmount,
+      tpBillCode: result,
       /* transactionServiceCharge: service,
       transactionDiscount: discount,
       transactionTax: tax, */
@@ -194,9 +195,118 @@ async function createBill(billName, billDesc, billAmount, billExternalReferenceN
   /* }) */
 }
 
+async function updatePaymentTable(billcode, status) {
+
+  let result = null;
+
+  try {
+    let statusSelect = null;
+
+    if(status == 1)
+    {
+      statusSelect = await knex.connect("reference")
+      .select("referenceValue" , "referenceName")
+      .where("referenceRefCode",16)
+      .andWhere("referenceValue",1);
+    }
+    else if(status == 2)
+    {
+      statusSelect = await knex.connect("reference")
+      .select("referenceValue" , "referenceName")
+      .where("referenceRefCode",16)
+      .andWhere("referenceValue",2);
+    }
+    else if(status == 3)
+    {
+      statusSelect = await knex.connect("reference")
+      .select("referenceValue" , "referenceName")
+      .where("referenceRefCode",16)
+      .andWhere("referenceValue",3);
+    }
+    
+    let sql = await knex.connect("transaction").update({
+      transactionStatusCode: statusSelect[0].referenceValue,
+    }).where("tpBillCode", billcode);
+
+    let sqlSelectID = await knex.connect("transaction")
+    .select("fkOrderID")
+    .where("tpBillCode",billcode);
+
+    let updateOrder = await knex.connect("order").update({
+      orderStatusCode : statusSelect[0].referenceValue
+    })
+    .where("orderId",sqlSelectID)
+
+    if (!updateOrder || updateOrder.length == 0) {
+      result = false;
+    } else {
+      result = updateOrder[0];
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return updateOrder;
+}
+
+async function tblorderPaymentPOS (serviceCharge ,discount, tax, total,customerName,customerPhone,orderID){
+
+  let result;
+
+  let invoiceNo = await generateInvoiceNo(orderID).then(
+    (res) => {
+      return res;
+    }
+  );
+
+  try {
+    let sql = await knex.connect("transaction").insert({
+      transactionInvoiceNo: invoiceNo,
+      transactionDatetime: getDateTime(),
+      transactionStatusCode: 2,
+      transactionAmount: total,
+      transactionAmountNett: total,
+      transactionMethodCode: 1,
+      transactionServiceCharge: serviceCharge,
+      transactionDiscount: discount,
+      transactionTax: tax,
+      paymentStatus: 2,
+      transactionPayorName: customerName,
+      transactionPayorPhoneNo: customerPhone,
+      fkOrderId: orderID,
+      fkCounterId: 1,
+    });
+
+
+    let sqlUpdate = await knex.connect("order")
+    .where("orderId",orderID)
+    .update({
+      orderStatusCode : 2,
+      orderDiscount: discount,
+      orderTax: tax,
+      orderServiceCharge: serviceCharge,
+      fkCounterId: 1
+    });
+
+    console.log("SQL UPDATE :" ,sqlUpdate)
+
+    if (!sqlUpdate || sqlUpdate.length == 0) {
+      result = false;
+    } else {
+      result = sqlUpdate[0];
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
 
 module.exports = {
   insertPaymentPOS,
   tblorderPayment,
-  createBill
+  createBill,
+  updatePaymentTable,
+  tblorderPaymentPOS,
 };

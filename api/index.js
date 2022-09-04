@@ -11,11 +11,13 @@ router.use('/tbl/insertOrder', require("./Order/insertOrder.js"));
 router.use('/tbl/updateOrdertbl', require("./Order/updateOrdertbl.js"));
 router.use('/tbl/getOrder', require("./Order/getOrder.js"));
 router.use('/tbl/getOrderCart', require("./Order/getOrderCart.js"));
+router.use('/tbl/getOrderConfirm', require("./Order/getOrderConfirm.js"));
 /* MEMBERSHIP */
 router.use('/tbl/getMembership', require("./Membership/getMembership.js"));
 /* PAYMENT */
 router.use('/tbl/tblorderPayment', require("./Payment/tblorderPayment.js"));
 router.use('/tbl/callbackPayment', require("./Payment/tblorderCallbackURL.js"));
+router.use('/tbl/tblOrderPOS', require("./Payment/tblorderPaymentPOS.js"));
 
 
 // * * * * * * * *  LOGIN * * * * * * * * //
