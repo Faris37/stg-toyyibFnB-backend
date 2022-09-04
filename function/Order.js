@@ -174,6 +174,45 @@ async function getOrder(orderID) {
   return result;
 }
 
+async function getOrderPOS(counter) {
+  let result = null;
+  let sql = null;
+  let sqlGetCounter = await knex
+    .connect("counter")
+    .select("counterId")
+    .where("counterSecretKey", counter);
+
+  try {
+    sql = await knex
+      .connect("order")
+      .join("transaction", "order.orderId", "transaction.fkOrderId")
+      .select(
+        "transactionInvoiceNo AS invoice_no",
+        "transactionMethodCode AS payment_method",
+        "transactionFPXTransactionId AS fpx_transaction_id",
+        "transactionCardInvoiceNo AS card_invoice_no",
+        "transactionStatusCode AS payment_status",
+        "orderDatetime AS order_date",
+        "orderNo AS order_no",
+        "orderTotalAmount AS order_total_amount",
+        "orderDetail AS order_detail"
+      )
+      .where("transaction.fkCounterId", sqlGetCounter[0].counterId);
+
+    if (!sql || sql.length == 0) {
+      result = false;
+    }
+    else{
+      result = sql;
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
 async function getOrderCart(orderid) {
   let result = null;
 
@@ -421,7 +460,6 @@ async function updateMenuOrderPOS(order, orderNo, type) {
     });
   });
 
-
   try {
     if (menuOrderExistCancel.length > 0) {
       for (let i = 0; i < menuOrderExistCancel.length; i++) {
@@ -495,4 +533,5 @@ module.exports = {
   updateOrderPOS,
   updateMenuOrderPOS,
   getOrderCart,
+  getOrderPOS,
 };
