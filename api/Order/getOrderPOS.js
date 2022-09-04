@@ -13,15 +13,13 @@ router.post("/", async (req, res) => {
   try {
     const getOrder = await model.getOrderPOS(counter);
 
-    if (!getOrder) return;
-
     if (getOrder) {
       result = {
         status: 200,
         message: "Success",
         data: getOrder,
       };
-    } else {
+    } else if (getOrder == false) {
       result = {
         status: 200,
         message: "No data",

@@ -68,7 +68,7 @@ async function insertmenuOrder(order, insertOrder) {
         menuOrderTypeOrderRefCode: order[i].orderType,
         menuOrderRemark: order[i].remarks,
       });
-      console.log('Insert Menu Order: ', sql)
+      console.log("Insert Menu Order: ", sql);
     }
 
     if (!sql || sql.length == 0) {
@@ -87,21 +87,23 @@ async function updateOrdertbl(total, order, orderID) {
   let result = null;
 
   try {
-
-    console.log("total :", total)
+    console.log("total :", total);
     var tax = total * 0.06;
     var service = total * 0.1;
     var totalAmount = total + tax + service;
-    console.log("tax :", tax)
-    console.log("service :", service)
-    console.log("totalAmount :", totalAmount)
-    
-    let sql = await knex.connect("order").update({
-      orderDatetime: getDateTime(),
-      orderAmount: total,
-      orderTotalAmount: totalAmount,
-      orderDetail: JSON.stringify(order),
-    }).where("orderId", orderID);;
+    console.log("tax :", tax);
+    console.log("service :", service);
+    console.log("totalAmount :", totalAmount);
+
+    let sql = await knex
+      .connect("order")
+      .update({
+        orderDatetime: getDateTime(),
+        orderAmount: total,
+        orderTotalAmount: totalAmount,
+        orderDetail: JSON.stringify(order),
+      })
+      .where("orderId", orderID);
 
     if (!sql || sql.length == 0) {
       result = false;
@@ -130,14 +132,16 @@ async function updatemenuOrdertbl(order, orderID) {
       .where("referenceValue", 4)
       .andWhere("referenceRefCode", 4);
 
-    let sqlupdateCancelled = await knex.connect("menu_order").update({
-      menuOrderStatusCode: sqlcancelled[0].referenceValue,
-      menuOrderStatusRefName: sqlcancelled[0].referenceName,
-    }).where('fkOrderId', orderID);
+    let sqlupdateCancelled = await knex
+      .connect("menu_order")
+      .update({
+        menuOrderStatusCode: sqlcancelled[0].referenceValue,
+        menuOrderStatusRefName: sqlcancelled[0].referenceName,
+      })
+      .where("fkOrderId", orderID);
 
-    console.log("Order :", order)
+    console.log("Order :", order);
     for (let i = 0; i < order.length; i++) {
-
       let sql = await knex.connect("menu_order").insert({
         menuOrderQuantity: order[i].menu_quantity,
         menuOrderStatusCode: sqlinCart[0].referenceValue,
@@ -168,7 +172,7 @@ async function getOrder(orderID) {
 
   result = await knex
     .connect(`order`)
-    .select("orderDetail", "orderAmount" , "orderNo")
+    .select("orderDetail", "orderAmount", "orderNo")
     .where(`orderID`, orderID);
 
   return result;
@@ -183,29 +187,29 @@ async function getOrderPOS(counter) {
     .where("counterSecretKey", counter);
 
   try {
-    sql = await knex
-      .connect("order")
-      .join("transaction", "order.orderId", "transaction.fkOrderId")
-      .select(
-        "transactionInvoiceNo AS invoice_no",
-        "transactionMethodCode AS payment_method",
-        "transactionFPXTransactionId AS fpx_transaction_id",
-        "transactionCardInvoiceNo AS card_invoice_no",
-        "transactionStatusCode AS payment_status",
-        "orderDatetime AS order_date",
-        "orderNo AS order_no",
-        "orderTotalAmount AS order_total_amount",
-        "orderDetail AS order_detail"
-      )
-      .where("transaction.fkCounterId", sqlGetCounter[0].counterId);
-
-    if (!sql || sql.length == 0) {
-      result = false;
+    if (sqlGetCounter.length > 0) {
+      sql = await knex
+        .connect("order")
+        .join("transaction", "order.orderId", "transaction.fkOrderId")
+        .select(
+          "transactionInvoiceNo AS invoice_no",
+          "transactionMethodCode AS payment_method",
+          "transactionFPXTransactionId AS fpx_transaction_id",
+          "transactionCardInvoiceNo AS card_invoice_no",
+          "transactionStatusCode AS payment_status",
+          "orderDatetime AS order_date",
+          "orderNo AS order_no",
+          "orderTotalAmount AS order_total_amount",
+          "orderDetail AS order_detail"
+        )
+        .where("transaction.fkCounterId", sqlGetCounter[0].counterId);
     }
-    else{
+
+    if (!sql || sql.length == 0 || sqlGetCounter.length == 0) {
+      result = false;
+    } else {
       result = sql;
     }
-
   } catch (error) {
     console.log(error);
   }
