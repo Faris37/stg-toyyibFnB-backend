@@ -32,5 +32,6 @@ router.use("/pos/getOrderList", require("./Order/getOrderPOS.js"));
 router.use("/pos/paymentOrder", require("./Payment/insertPaymentPOS.js"));
 
 // * * * * * * * *  SHIFT  * * * * * * * * //
-router.use("/pos/shift", require("./Shift/insertShift.js"));
+router.use("/pos/insertShift", require("./Shift/insertShift.js"));
+router.use("/pos/getShift", require("./Shift/getShift.js"));
 module.exports = router;

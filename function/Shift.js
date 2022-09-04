@@ -22,8 +22,8 @@ async function insertShift(counter, cash_open, staff_id) {
         shiftOpenDenomination: cash_open,
         //   shiftEndTime: getDateTime(),
         shiftStatus: "Open",
-        shiftCounter: sqlGetCounter[0].counterId,
-        shiftStaffId: staff_id,
+        fkCounterId: sqlGetCounter[0].counterId,
+        fkStaffId: staff_id,
       });
     }
     if (!sql || sql.length == 0 || sqlGetCounter.length == 0) {
@@ -42,7 +42,54 @@ async function insertShift(counter, cash_open, staff_id) {
 
 async function updateShift() {}
 
-async function getShift() {}
+async function getShift(counter, staff_id, type) {
+  let sqlGetDetails = null;
+  let sqlGetMaxId = null;
+  let sqlGetCounter = await knex
+    .connect("counter")
+    .select("counterId")
+    .where("counterSecretKey", counter);
+
+  try {
+    if (type == "open") {
+      sqlGetMaxId = await knex
+        .connect("shift")
+        .max("shiftId as maxId")
+        .where("fkCounterId", sqlGetCounter[0].counterId)
+        .andWhere("fkStaffId", staff_id)
+        .andWhere("shiftStatus", "Open")
+        .andWhere("shiftCloseDenomination", null)
+        .andWhere("shiftEndDateTime", null);
+
+      sqlGetDetails = await knex
+        .connect("shift")
+        .select(
+          "shiftId as shift_id, shiftStartDateTime as shift_startDatetime, shiftOpenDenomination as shift_openDenomination, shiftStatus as shift_status"
+        )
+        .where("fkCounterId", sqlGetCounter[0].counterId)
+        .andWhere("fkStaffId", staff_id)
+        .andWhere("shiftStatus", "Open")
+        .andWhere("shiftCloseDenomination", null)
+        .andWhere("shiftEndDateTime", null)
+        .andWhere("shiftId", sqlGetMaxId[0].maxId);
+    }
+    console.log("sqlGetMaxId", sqlGetMaxId);
+    console.log(sqlGetDetails);
+    if (
+      !sqlGetDetails ||
+      sqlGetDetails.length == 0 ||
+      sqlGetCounter.length == 0
+    ) {
+      result = false;
+    } else {
+      result = sqlGetDetails[0];
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
 
 module.exports = {
   insertShift,
