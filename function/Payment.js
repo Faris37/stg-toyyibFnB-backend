@@ -285,15 +285,18 @@ async function tblorderPaymentPOS (serviceCharge ,discount, tax, total,customerN
       orderDiscount: discount,
       orderTax: tax,
       orderServiceCharge: serviceCharge,
-      fkCounterId: 1
+      fkCounterId: 1,
+      orderFrom: "table"
     });
 
-    console.log("SQL UPDATE :" ,sqlUpdate)
+    let sqlOrderNO = await knex.connect("order")
+    .select("orderNo as order_no")
+    .where("orderId",orderID);
 
-    if (!sqlUpdate || sqlUpdate.length == 0) {
+    if (!sqlOrderNO || sqlOrderNO.length == 0) {
       result = false;
     } else {
-      result = sqlUpdate[0];
+      result = sqlOrderNO[0];
     }
   } catch (error) {
     console.log(error);

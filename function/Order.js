@@ -33,6 +33,7 @@ async function insertOrder(total, order) {
       orderCustomerName: order[0].custName,
       orderCustomerPhoneNo: order[0].custPhone,
       fkCounterId: 1,
+      orderFrom: "Table"
     });
 
     if (!sql || sql.length == 0) {
@@ -552,4 +553,5 @@ module.exports = {
   updateMenuOrderPOS,
   getOrderCart,
   getOrderPOS,
+  getOrderConfirm,
 };
