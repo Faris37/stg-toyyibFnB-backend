@@ -17,7 +17,7 @@ router.post("/", async (req, res) => {
     let counter = param.counter;
     let discount = param.discount;
     let order_no = param.order_no;
-    let type = '';
+    let type = param.type;
 
     let updateOrder = await model.updateOrderPOS(
       amt,
