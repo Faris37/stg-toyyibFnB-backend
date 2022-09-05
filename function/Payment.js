@@ -109,8 +109,8 @@ async function createBill(billName, billDesc, billAmount, billExternalReferenceN
   const params = new URLSearchParams();
 
   // required data
-  params.append('userSecretKey', '3n8xhu0t-6tf8-s3pm-s3hc-3lx68vnj32jc'); /* LETAK ENV */
-  params.append('categoryCode', '1to0s08q');
+  params.append('userSecretKey', process.env.SECRET_KEY); /* LETAK ENV */
+  params.append('categoryCode', process.env.CATEGORY_CODE);
   params.append('billName', billName);
   params.append('billDescription', billDesc);
   params.append('billPriceSetting', 1);
