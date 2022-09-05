@@ -35,6 +35,7 @@ router.post("/", async (req, res) => {
     result = {
       status: 500,
       message: `API Error`,
+      data: error,
     };
   }
 
