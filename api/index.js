@@ -42,6 +42,8 @@ router.use("/getTypeOrder", require("./Reference/getTypeOrder.js"));
 router.use("/pos/insertOrder", require("./Order/insertOrderPOS.js"));
 router.use("/pos/updateOrder", require("./Order/updateOrderPOS.js"));
 router.use("/pos/getOrderList", require("./Order/getOrderPOS.js"));
+router.use("/pos/getOrderPending", require("./Order/getOrderPending.js"));
+router.use("/pos/getOrderCartPOS", require("./Order/getOrderCartPOS.js"));
 
 // * * * * * * * *  PAYMENT ORDER POS * * * * * * * * //
 router.use("/pos/paymentOrder", require("./Payment/insertPaymentPOS.js"));
