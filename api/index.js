@@ -49,4 +49,8 @@ router.use("/pos/paymentOrder", require("./Payment/insertPaymentPOS.js"));
 // * * * * * * * *  SHIFT  * * * * * * * * //
 router.use("/pos/insertShift", require("./Shift/insertShift.js"));
 router.use("/pos/getShift", require("./Shift/getShift.js"));
+router.use("/pos/updateShift", require("./Shift/updateShift.js"));
+
+
+
 module.exports = router;

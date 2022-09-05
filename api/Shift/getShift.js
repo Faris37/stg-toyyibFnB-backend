@@ -2,14 +2,14 @@ const express = require("express"); // MUST HAVE
 const router = express.Router(); // MUST HAVE
 const model = require("../../function/Shift.js"); // INCLUDE FUNCTION FILE
 
-router.get("/", async (req, res) => {
+router.post("/", async (req, res) => {
   let result = null;
   let param = null;
 
   param = req.body;
 
   counter = param.counterSecretKey;
-  staff_id = param.staff_id;
+  staff_id = param.staffId;
   type = param.type;
 
   try {

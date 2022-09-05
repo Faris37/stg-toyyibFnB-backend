@@ -8,34 +8,33 @@ router.post("/", async (req, res) => {
 
   param = req.body;
 
-  counter = param.counterSecretKey;
-  staff_id = param.staff_id;
+  shift_id = param.shift_id;
   cash_open = param.cash_open;
+  type = param.type;
 
   try {
-    const insertShift = await model.insertShift( counter, cash_open , staff_id);
+    const updateShift = await model.updateShift(shift_id, cash_open, type);
 
-    if (insertShift == false) {
-        result = {
-            status: 500,
-            message: `API Error`,
-          };
+    if (updateShift == false) {
+      result = {
+        status: 500,
+        message: `API Error`,
+      };
     }
 
-    if (insertShift) {
+    if (updateShift) {
       result = {
         status: 200,
         message: "Success",
-        data: insertShift,
+        data: updateShift,
       };
-    } 
+    }
   } catch (error) {
     // console.log(error); // LOG ERROR
 
     result = {
       status: 500,
       message: `API Error`,
-      data: error,
     };
   }
 
