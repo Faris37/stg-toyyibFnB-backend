@@ -125,16 +125,19 @@ async function updateOrdertbl(total, order, orderID) {
     var service = total * 0.1;
     var totalAmount = total + tax + service;
 
-    console.log("tax :", tax)
-    console.log("service :", service)
-    console.log("totalAmount :", totalAmount)
+    console.log("tax :", tax);
+    console.log("service :", service);
+    console.log("totalAmount :", totalAmount);
 
-    let sql = await knex.connect("order").update({
-      orderDatetime: getDateTime(),
-      orderAmount: total,
-      orderTotalAmount: totalAmount,
-      orderDetail: JSON.stringify(order),
-    }).where("orderId", orderID);
+    let sql = await knex
+      .connect("order")
+      .update({
+        orderDatetime: getDateTime(),
+        orderAmount: total,
+        orderTotalAmount: totalAmount,
+        orderDetail: JSON.stringify(order),
+      })
+      .where("orderId", orderID);
 
     console.log("tax :", tax);
     console.log("service :", service);
@@ -232,6 +235,7 @@ async function getOrderPOS(counter) {
           "transactionFPXTransactionId AS fpx_transaction_id",
           "transactionCardInvoiceNo AS card_invoice_no",
           "transactionStatusCode AS payment_status",
+          "transactionDatetime AS payment_datetime",
           "orderDatetime AS order_date",
           "orderNo AS order_no",
           "orderTotalAmount AS order_total_amount",
@@ -265,11 +269,16 @@ async function getOrderCart(orderid) {
 
 async function getOrderConfirm(billCode) {
   let result = null;
-  
-  result = await knex.connect('order')
-    .select('orderDetail as order_detail', 'orderTotalAmount as ordertotal_amount', 'orderNo as order_no' , 'orderTableNo as table_no', 'orderTax as tax' , 'orderServiceCharge as service' , 'orderDiscount as discount' , 'orderDatetime as order_date' , 'transactionInvoiceNo as transac_no')
-    .join('transaction', 'order.orderId', '=', 'transaction.fkOrderID')
-    .where('transaction.tpBillCode', billCode)
+
+  result = await knex
+    .connect("order")
+    .select(
+      "orderDetail as order_detail",
+      "orderTotalAmount as ordertotal_amount",
+      "orderNo as order_no"
+    )
+    .join("transaction", "order.orderId", "=", "transaction.fkOrderID")
+    .where("transaction.tpBillCode", billCode);
 
   return result;
 }
@@ -429,17 +438,32 @@ async function updateOrderPOS(
     .where("referenceValue", 3)
     .andWhere("referenceRefCode", 4);
 
+  let status = null;
+
+  let selectStatusOrder = await knex
+    .connect("order")
+    .select("orderStatusCode")
+    .where("orderNo", orderNo);
+
+  if (type == "payment") {
+    status = 1;
+  } else if (type == "edit") {
+    if (selectStatusOrder[0].orderStatusCode == 2) {
+      status = 2;
+    } else if (selectStatusOrder[0].orderStatusCode == 3) {
+      status = 3;
+    }
+  }
+
   //   console.log(orderId);
   try {
     let sql = await knex
       .connect("order")
       .update({
-        orderStatusCode: type == "payment" ? 1 : 3,
+        orderStatusCode: status,
         orderDatetime: getDateTime(),
         orderAmount: amount,
         orderTotalAmount: totalAmount,
-        orderCustomerName: "Customer Name",
-        orderCustomerPhoneNo: "Customer Phone",
         orderDetail: JSON.stringify(order),
         orderDiscount: discount,
         orderTax: tax,
@@ -572,6 +596,55 @@ async function updateMenuOrderPOS(order, orderNo, type) {
   return result;
 }
 
+async function getOrderPending() {
+  let result = null;
+  let sql = null;
+
+  try {
+    sql = await knex
+      .connect("order")
+      .select(
+        "orderNo as order_no",
+        "orderDatetime as order_datetime",
+        "orderAmount as order_amount",
+        "orderTotalAmount as order_total_amount",
+        "orderCustomerName as order_customerName",
+        "orderCustomerPhoneNo as order_customerPhoneNo",
+        "orderStatusCode as order_status",
+        "orderTableNo as order_tableNo"
+      )
+      .where("orderStatusCode", 2);
+
+    if (!sql || sql.length == 0) {
+      result = false;
+    } else {
+      result = sql;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function getOrderCartPOS(order_no) {
+  let result = null;
+
+  result = await knex
+    .connect(`order`)
+    .select(
+      "orderDetail as order",
+      "orderAmount as amt",
+      "orderTotalAmount as totalAmt",
+      "orderDiscount as discount",
+      "orderTax as tax",
+      "orderServiceCharge as serviceCharge"
+    )
+    .where(`orderNo`, order_no);
+
+  return result[0];
+}
+
 module.exports = {
   insertOrder,
   insertmenuOrder,
@@ -585,4 +658,6 @@ module.exports = {
   getOrderCart,
   getOrderPOS,
   getOrderConfirm,
+  getOrderPending,
+  getOrderCartPOS,
 };
