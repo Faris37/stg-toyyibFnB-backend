@@ -5,7 +5,7 @@ function getDateTime() {
   return moment().format("YYYY-MM-DD HH:mm:ss");
 }
 
-async function insertOrder(total, order) {
+async function insertOrder(total, order, table) {
   let result = null;
 
   try {
@@ -15,13 +15,40 @@ async function insertOrder(total, order) {
       .where("referenceValue", 3)
       .andWhere("referenceRefCode", 4);
 
+
+    var mmberDisc = order[0].membership_no;
+
+    var discountOutlet = 0;
+    var Discount = 0;
+    var mmbrDisc = 0;
     var tax = total * 0.06;
     var service = total * 0.1;
-    var totalAmount = total + tax + service;
+    if (total >= 70) {
+      discountOutlet = total * 0.1;
+    }
+    else
+    {
+      discountOutlet = 0;
+    }
+    if (mmberDisc != "") {
+      mmbrDisc = total * 0.07;
+    }
+    else
+    {
+      mmbrDisc = 0;
+    }
+    Discount = discountOutlet + mmbrDisc;
+    var totalAmount = total + tax + service - Discount;
+    
 
     let orderNo = await generateOrderID(4).then((res) => {
       return res;
     });
+
+
+
+    
+
 
     let sql = await knex.connect("order").insert({
       orderNo: orderNo,
@@ -33,7 +60,11 @@ async function insertOrder(total, order) {
       orderCustomerName: order[0].custName,
       orderCustomerPhoneNo: order[0].custPhone,
       fkCounterId: 1,
-      orderFrom: "Table"
+      orderFrom: "Table",
+      orderTableNo: table,
+      orderDiscount: Discount,
+      orderTax: tax,
+      orderServiceCharge: service
     });
 
     if (!sql || sql.length == 0) {
@@ -234,11 +265,11 @@ async function getOrderCart(orderid) {
 
 async function getOrderConfirm(billCode) {
   let result = null;
-
+  
   result = await knex.connect('order')
-  .select('orderDetail as order_detail', 'orderTotalAmount as ordertotal_amount' , 'orderNo as order_no')
-  .join('transaction', 'order.orderId', '=', 'transaction.fkOrderID')
-  .where('transaction.tpBillCode',billCode)
+    .select('orderDetail as order_detail', 'orderTotalAmount as ordertotal_amount', 'orderNo as order_no' , 'orderTableNo as table_no', 'orderTax as tax' , 'orderServiceCharge as service' , 'orderDiscount as discount' , 'orderDatetime as order_date' , 'transactionInvoiceNo as transac_no')
+    .join('transaction', 'order.orderId', '=', 'transaction.fkOrderID')
+    .where('transaction.tpBillCode', billCode)
 
   return result;
 }

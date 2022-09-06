@@ -9,6 +9,7 @@ router.post("/", async (req, res) => {
 
     let order = [];
     let total = null;
+    let table = null;
     
 
     try {
@@ -18,10 +19,12 @@ router.post("/", async (req, res) => {
 
         order = param.order;
         total = param.total;
+        table = param.table;
 
         let insertOrder = await model.insertOrder(
             total,
-            order
+            order,
+            table,
         )
 
         let insertmenuOrder = await model.insertmenuOrder(

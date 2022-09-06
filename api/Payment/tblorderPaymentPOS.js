@@ -33,6 +33,7 @@ router.post("/", async (req, res) => {
             serviceCharge ,discount, tax, total,customerName,customerPhone,orderID
         );
 
+
         if (tblorderPaymentPOS != "") {
             result = {
                 response: 200,
