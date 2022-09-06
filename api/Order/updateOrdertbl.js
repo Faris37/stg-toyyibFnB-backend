@@ -10,6 +10,7 @@ router.post("/", async (req, res) => {
     let order = [];
     let total = null;
     let orderID = null;
+    let discount = null;
     
 
     try {
@@ -20,11 +21,13 @@ router.post("/", async (req, res) => {
         order = param.order;
         total = param.total;
         orderID = param.orderID;
+        discount = param.discounted;
 
         let updateOrdertbl = await model.updateOrdertbl(
             total,
             order,
-            orderID
+            orderID,
+            discount,
         )
 
         let updatemenuOrdertbl = await model.updatemenuOrdertbl(

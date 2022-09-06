@@ -109,7 +109,7 @@ async function insertmenuOrder(order, insertOrder) {
   return result;
 }
 
-async function updateOrdertbl(total, order, orderID) {
+async function updateOrdertbl(total, order, orderID, discounted) {
   let result = null;
 
   try {
@@ -117,6 +117,7 @@ async function updateOrdertbl(total, order, orderID) {
     var tax = total * 0.06;
     var service = total * 0.1;
     var totalAmount = total + tax + service;
+    totalAmount = totalAmount - discounted;
 
     console.log("tax :", tax)
     console.log("service :", service)

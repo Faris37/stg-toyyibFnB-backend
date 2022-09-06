@@ -102,7 +102,7 @@ async function tblorderPayment() {
   /* Axios */
 }
 
-async function createBill(billName, billDesc, billAmount, billExternalReferenceNo, billTo, billPhone, orderNo) {
+async function createBill(billName, billDesc, billAmount, billExternalReferenceNo, billTo, billPhone, orderNo ,serviceCharge ,discount, tax) {
 
   let result = [];
 
@@ -118,7 +118,7 @@ async function createBill(billName, billDesc, billAmount, billExternalReferenceN
 
   params.append('billAmount', billAmount);
   params.append('billReturnUrl', 'http://localhost:8080/order/confirm');
-  params.append('billCallbackUrl', 'https://toyyibfnb.com/api/tbl/tblorderCallbackURL');/* https://toyyibfnb.com/api/tbl/tblorderCallbackURL */
+  params.append('billCallbackUrl', 'https://toyyibfnb.com/api/tbl/callbackPayment');/* https://toyyibfnb.com/api/tbl/tblorderCallbackURL */
   params.append('billExternalReferenceNo', orderNo); /* Order No ORDER */
   params.append('billTo', billTo);
   params.append('billEmail', 'Farisizwanfauzi@gmail.com');
@@ -172,13 +172,14 @@ async function createBill(billName, billDesc, billAmount, billExternalReferenceN
       transactionAmount: sqlGetOrderId[0].orderTotalAmount,
       transactionAmountNett: sqlGetOrderId[0].orderTotalAmount,
       tpBillCode: result,
-      /* transactionServiceCharge: service,
+      transactionServiceCharge: serviceCharge,
       transactionDiscount: discount,
-      transactionTax: tax, */
+      transactionTax: tax,
       paymentStatus: 1,
       transactionPayorName: "Customer Name",
       transactionPayorPhoneNo: "Customer Phone",
-      fkOrderId: sqlGetOrderId[0].orderId
+      fkOrderId: sqlGetOrderId[0].orderId,
+      transactionMethodCode: 2,
     });
 
     if (!sql || sql.length == 0) {
