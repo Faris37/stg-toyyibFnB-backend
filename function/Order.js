@@ -118,19 +118,16 @@ async function updateOrdertbl(total, order, orderID) {
     var service = total * 0.1;
     var totalAmount = total + tax + service;
 
-    console.log("tax :", tax);
-    console.log("service :", service);
-    console.log("totalAmount :", totalAmount);
+    console.log("tax :", tax)
+    console.log("service :", service)
+    console.log("totalAmount :", totalAmount)
 
-    let sql = await knex
-      .connect("order")
-      .update({
-        orderDatetime: getDateTime(),
-        orderAmount: total,
-        orderTotalAmount: totalAmount,
-        orderDetail: JSON.stringify(order),
-      })
-      .where("orderId", orderID);
+    let sql = await knex.connect("order").update({
+      orderDatetime: getDateTime(),
+      orderAmount: total,
+      orderTotalAmount: totalAmount,
+      orderDetail: JSON.stringify(order),
+    }).where("orderId", orderID);
 
     console.log("tax :", tax);
     console.log("service :", service);
