@@ -26,29 +26,22 @@ async function insertOrder(total, order, table) {
     if (total >= 70) {
       discountOutlet = total * 0.1;
     }
-    else
-    {
+    else {
       discountOutlet = 0;
     }
     if (mmberDisc != "") {
       mmbrDisc = total * 0.07;
     }
-    else
-    {
+    else {
       mmbrDisc = 0;
     }
     Discount = discountOutlet + mmbrDisc;
     var totalAmount = total + tax + service - Discount;
-    
+
 
     let orderNo = await generateOrderID(4).then((res) => {
       return res;
     });
-
-
-
-    
-
 
     let sql = await knex.connect("order").insert({
       orderNo: orderNo,
@@ -275,7 +268,13 @@ async function getOrderConfirm(billCode) {
     .select(
       "orderDetail as order_detail",
       "orderTotalAmount as ordertotal_amount",
-      "orderNo as order_no"
+      "orderNo as order_no",
+      "orderTableNo as table_no",
+      "orderTax as tax",
+      "orderServiceCharge as service",
+      "orderDiscount as discount",
+      "orderDatetime as order_date",
+      "transactionInvoiceNo as transac_no"
     )
     .join("transaction", "order.orderId", "=", "transaction.fkOrderID")
     .where("transaction.tpBillCode", billCode);
