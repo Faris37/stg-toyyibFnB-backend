@@ -206,35 +206,28 @@ async function getOrder(orderID) {
   return result;
 }
 
-async function getOrderPOS(counter) {
+async function getOrderPOS() {
   let result = null;
   let sql = null;
-  let sqlGetCounter = await knex
-    .connect("counter")
-    .select("counterId")
-    .where("counterSecretKey", counter);
 
   try {
-    if (sqlGetCounter.length > 0) {
-      sql = await knex
-        .connect("order")
-        .join("transaction", "order.orderId", "transaction.fkOrderId")
-        .select(
-          "transactionInvoiceNo AS invoice_no",
-          "transactionMethodCode AS payment_method",
-          "transactionFPXTransactionId AS fpx_transaction_id",
-          "transactionCardInvoiceNo AS card_invoice_no",
-          "transactionStatusCode AS payment_status",
-          "transactionDatetime AS payment_datetime",
-          "orderDatetime AS order_date",
-          "orderNo AS order_no",
-          "orderTotalAmount AS order_total_amount",
-          "orderDetail AS order_detail"
-        )
-        .where("transaction.fkCounterId", sqlGetCounter[0].counterId);
-    }
+    sql = await knex
+      .connect("order")
+      .join("transaction", "order.orderId", "transaction.fkOrderId")
+      .select(
+        "transactionInvoiceNo AS invoice_no",
+        "transactionMethodCode AS payment_method",
+        "transactionFPXTransactionId AS fpx_transaction_id",
+        "transactionCardInvoiceNo AS card_invoice_no",
+        "transactionStatusCode AS payment_status",
+        "transactionDatetime AS payment_datetime",
+        "orderDatetime AS order_date",
+        "orderNo AS order_no",
+        "orderTotalAmount AS order_total_amount",
+        "orderDetail AS order_detail"
+      );
 
-    if (!sql || sql.length == 0 || sqlGetCounter.length == 0) {
+    if (!sql || sql.length == 0) {
       result = false;
     } else {
       result = sql;

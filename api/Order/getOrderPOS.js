@@ -2,16 +2,14 @@ const express = require("express"); // MUST HAVE
 const router = express.Router(); // MUST HAVE
 const model = require("../../function/Order"); // INCLUDE FUNCTION FILE
 
-router.post("/", async (req, res) => {
+router.get("/", async (req, res) => {
   let result = null;
   let param = null;
 
   param = req.body;
 
-  counter = param.counterSecretKey;
-
   try {
-    const getOrder = await model.getOrderPOS(counter);
+    const getOrder = await model.getOrderPOS();
 
     if (getOrder) {
       result = {
