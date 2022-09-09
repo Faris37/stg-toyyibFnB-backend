@@ -102,7 +102,7 @@ async function tblorderPayment() {
   /* Axios */
 }
 
-async function createBill(billName, billDesc, billAmount, billExternalReferenceNo, billTo, billPhone, orderNo ,serviceCharge ,discount, tax) {
+async function createBill(billName, billDesc, billAmount, billExternalReferenceNo, billTo, billPhone, orderNo, serviceCharge, discount, tax) {
 
   let result = [];
 
@@ -168,7 +168,7 @@ async function createBill(billName, billDesc, billAmount, billExternalReferenceN
     let sql = await knex.connect("transaction").insert({
       transactionInvoiceNo: invoiceNo,
       transactionDatetime: getDateTime(),
-      transactionStatusCode: 2,
+      transactionStatusCode: 4,
       transactionAmount: sqlGetOrderId[0].orderTotalAmount,
       transactionAmountNett: sqlGetOrderId[0].orderTotalAmount,
       tpBillCode: result,
@@ -203,40 +203,34 @@ async function updatePaymentTable(billcode, status) {
   try {
     let statusSelect = null;
 
-    if(status == 1)
-    {
+    if (status == 1) {
       statusSelect = await knex.connect("reference")
-      .select("referenceValue" , "referenceName")
-      .where("referenceRefCode",16)
-      .andWhere("referenceValue",1);
+        .select("referenceValue", "referenceName")
+        .where("referenceRefCode", 16)
+        .andWhere("referenceValue", 1);
     }
-    else if(status == 2)
-    {
+    else if (status == 2) {
       statusSelect = await knex.connect("reference")
-      .select("referenceValue" , "referenceName")
-      .where("referenceRefCode",16)
-      .andWhere("referenceValue",2);
+        .select("referenceValue", "referenceName")
+        .where("referenceRefCode", 16)
+        .andWhere("referenceValue", 2);
     }
-    else if(status == 3)
-    {
+    else if (status == 3) {
       statusSelect = await knex.connect("reference")
-      .select("referenceValue" , "referenceName")
-      .where("referenceRefCode",16)
-      .andWhere("referenceValue",3);
+        .select("referenceValue", "referenceName")
+        .where("referenceRefCode", 16)
+        .andWhere("referenceValue", 3);
     }
-    
+
     let sql = await knex.connect("transaction").update({
       transactionStatusCode: statusSelect[0].referenceValue,
+      paymentDatetimeCallback: getDateTime(),
     }).where("tpBillCode", billcode);
 
-    let sqlSelectID = await knex.connect("transaction")
-    .select("fkOrderID")
-    .where("tpBillCode",billcode);
-
-    let updateOrder = await knex.connect("order").update({
-      orderStatusCode : statusSelect[0].referenceValue
-    })
-    .where("orderId",sqlSelectID)
+    let updateOrder = await knex.connect("order")
+      .join("transaction", "order.orderId", "=", "transaction.fkOrderID")
+      .update({orderStatusCode: statusSelect[0].referenceValue,})
+      .where("transaction.tpBillCode", billcode)
 
     if (!updateOrder || updateOrder.length == 0) {
       result = false;
@@ -250,7 +244,7 @@ async function updatePaymentTable(billcode, status) {
   return updateOrder;
 }
 
-async function tblorderPaymentPOS (serviceCharge ,discount, tax, total,customerName,customerPhone,orderID){
+async function tblorderPaymentPOS(serviceCharge, discount, tax, total, customerName, customerPhone, orderID) {
 
   let result;
 
@@ -261,7 +255,7 @@ async function tblorderPaymentPOS (serviceCharge ,discount, tax, total,customerN
   );
 
   try {
-    let sql = await knex.connect("transaction").insert({
+    /* let sql = await knex.connect("transaction").insert({
       transactionInvoiceNo: invoiceNo,
       transactionDatetime: getDateTime(),
       transactionStatusCode: 2,
@@ -276,23 +270,23 @@ async function tblorderPaymentPOS (serviceCharge ,discount, tax, total,customerN
       transactionPayorPhoneNo: customerPhone,
       fkOrderId: orderID,
       fkCounterId: 1,
-    });
+    }); */
 
 
     let sqlUpdate = await knex.connect("order")
-    .where("orderId",orderID)
-    .update({
-      orderStatusCode : 2,
-      orderDiscount: discount,
-      orderTax: tax,
-      orderServiceCharge: serviceCharge,
-      fkCounterId: 1,
-      orderFrom: "table"
-    });
+      .where("orderId", orderID)
+      .update({
+        orderStatusCode: 2,
+        orderDiscount: discount,
+        orderTax: tax,
+        orderServiceCharge: serviceCharge,
+        fkCounterId: 1,
+        orderFrom: "table"
+      });
 
     let sqlOrderNO = await knex.connect("order")
-    .select("orderNo as order_no")
-    .where("orderId",orderID);
+      .select("orderNo as order_no")
+      .where("orderId", orderID);
 
     if (!sqlOrderNO || sqlOrderNO.length == 0) {
       result = false;

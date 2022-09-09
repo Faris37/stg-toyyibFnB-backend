@@ -127,6 +127,9 @@ async function updateOrdertbl(total, order, orderID, discounted) {
       orderDatetime: getDateTime(),
       orderAmount: total,
       orderTotalAmount: totalAmount,
+      orderDiscount: discounted,
+      orderTax: tax,
+      orderServiceCharge: service,
       orderDetail: JSON.stringify(order),
     }).where("orderId", orderID);
 
@@ -253,6 +256,7 @@ async function getOrderCart(orderid) {
 
 async function getOrderConfirm(billCode) {
   let result = null;
+  let sql = null;
 
   result = await knex
     .connect("order")
@@ -269,6 +273,8 @@ async function getOrderConfirm(billCode) {
     )
     .join("transaction", "order.orderId", "=", "transaction.fkOrderID")
     .where("transaction.tpBillCode", billCode);
+
+  sql = await knex.connect("transaction").where("tpBillCode", billCode).update({paymentDatetimeReturnURL:getDateTime()})
 
   return result;
 }
