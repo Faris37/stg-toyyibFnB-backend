@@ -38,6 +38,17 @@ async function insertOrder(total, order, table) {
     Discount = discountOutlet + mmbrDisc;
     var totalAmount = total + tax + service - Discount;
 
+    var custName = order[0].custName;
+    var custPhone = order[0].custPhone;
+    if(custName == "")
+    {
+      custName = "Guest";
+    }
+    if(custPhone == "")
+    {
+      custPhone = "Guest"
+    }
+
 
     let orderNo = await generateOrderID(4).then((res) => {
       return res;
@@ -50,8 +61,8 @@ async function insertOrder(total, order, table) {
       orderAmount: total,
       orderTotalAmount: totalAmount.toFixed(2),
       orderDetail: JSON.stringify(order),
-      orderCustomerName: order[0].custName,
-      orderCustomerPhoneNo: order[0].custPhone,
+      orderCustomerName: custName,
+      orderCustomerPhoneNo: custPhone,
       fkCounterId: 1,
       orderFrom: "Table",
       orderTableNo: table,
@@ -254,7 +265,7 @@ async function getOrderCart(orderid) {
   return result;
 }
 
-async function getOrderConfirm(billCode) {
+async function getOrderConfirm(billCode , transactionId) {
   let result = null;
   let sql = null;
 
@@ -274,7 +285,7 @@ async function getOrderConfirm(billCode) {
     .join("transaction", "order.orderId", "=", "transaction.fkOrderID")
     .where("transaction.tpBillCode", billCode);
 
-  sql = await knex.connect("transaction").where("tpBillCode", billCode).update({paymentDatetimeReturnURL:getDateTime()})
+  sql = await knex.connect("transaction").where("tpBillCode", billCode).update({paymentDatetimeReturnURL:getDateTime() , transactionTPNo:transactionId })
 
   return result;
 }

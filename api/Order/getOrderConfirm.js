@@ -10,16 +10,19 @@ router.post("/", async (req, res) => {
     let param = null;
     let result = null;
     let billcode = null;
+    let transactionId = null;
 
     try {
 
         param = req.body;
 
         billcode = param.billCode;
+        transactionId = param.transactionId;
 
         // GET USER FUNCTION
         const getOrderConfirm = await model.getOrderConfirm(
             billcode,
+            transactionId,
         );
 
         if (!getOrderConfirm) return;
