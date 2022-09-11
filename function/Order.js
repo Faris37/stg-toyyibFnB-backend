@@ -22,7 +22,7 @@ async function insertOrder(total, order, table) {
     var Discount = 0;
     var mmbrDisc = 0;
     var tax = total * 0.06;
-    var service = total * 0.1;
+    /* var service = total * 0.1; */
     if (total >= 70) {
       discountOutlet = total * 0.1;
     }
@@ -36,7 +36,7 @@ async function insertOrder(total, order, table) {
       mmbrDisc = 0;
     }
     Discount = discountOutlet + mmbrDisc;
-    var totalAmount = total + tax + service - Discount;
+    var totalAmount = total + tax  - Discount;
 
     var custName = order[0].custName;
     var custPhone = order[0].custPhone;
@@ -68,7 +68,7 @@ async function insertOrder(total, order, table) {
       orderTableNo: table,
       orderDiscount: Discount,
       orderTax: tax,
-      orderServiceCharge: service
+      
     });
 
     if (!sql || sql.length == 0) {
@@ -126,13 +126,9 @@ async function updateOrdertbl(total, order, orderID, discounted) {
   try {
     console.log("total :", total);
     var tax = total * 0.06;
-    var service = total * 0.1;
-    var totalAmount = total + tax + service;
+    /* var service = total * 0.1; */
+    var totalAmount = total + tax ;
     totalAmount = totalAmount - discounted;
-
-    console.log("tax :", tax)
-    console.log("service :", service)
-    console.log("totalAmount :", totalAmount)
 
     let sql = await knex.connect("order").update({
       orderDatetime: getDateTime(),
@@ -140,13 +136,9 @@ async function updateOrdertbl(total, order, orderID, discounted) {
       orderTotalAmount: totalAmount,
       orderDiscount: discounted,
       orderTax: tax,
-      orderServiceCharge: service,
       orderDetail: JSON.stringify(order),
     }).where("orderId", orderID);
 
-    console.log("tax :", tax);
-    console.log("service :", service);
-    console.log("totalAmount :", totalAmount);
 
     if (!sql || sql.length == 0) {
       result = false;
@@ -277,7 +269,6 @@ async function getOrderConfirm(billCode , transactionId) {
       "orderNo as order_no",
       "orderTableNo as table_no",
       "orderTax as tax",
-      "orderServiceCharge as service",
       "orderDiscount as discount",
       "orderDatetime as order_date",
       "transactionInvoiceNo as transac_no"
