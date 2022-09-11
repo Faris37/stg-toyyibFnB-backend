@@ -229,8 +229,20 @@ async function updatePaymentTable(billcode, status) {
 
     let updateOrder = await knex.connect("order")
       .join("transaction", "order.orderId", "=", "transaction.fkOrderID")
-      .update({orderStatusCode: statusSelect[0].referenceValue,})
+      .update({ orderStatusCode: statusSelect[0].referenceValue, })
       .where("transaction.tpBillCode", billcode)
+
+    let sqlSelect = await knex.connect("transaction")
+      .select("fkOrderID")
+      .where("tpBillCode", billcode);
+
+    let sqlmenu_order = await knex.connect("menu_order")
+      .update({
+        menuOrderStatusRefName: "Completed",
+        menuOrderStatusCode: 1
+      })
+      .where("fkOrderId", sqlSelect[0].fkOrderID)
+      .andWhere("menuOrderStatusCode", 3);
 
     if (!updateOrder || updateOrder.length == 0) {
       result = false;
@@ -281,7 +293,7 @@ async function tblorderPaymentPOS(serviceCharge, discount, tax, total, customerN
         orderTax: tax,
         orderServiceCharge: serviceCharge,
         fkCounterId: 1,
-        orderFrom: "table"
+        orderFrom: "Table"
       });
 
     let sqlOrderNO = await knex.connect("order")
