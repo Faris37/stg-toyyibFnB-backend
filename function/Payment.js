@@ -117,7 +117,7 @@ async function createBill(billName, billDesc, billAmount, billExternalReferenceN
   params.append('billPayorInfo', 0);
 
   params.append('billAmount', billAmount);
-  params.append('billReturnUrl', 'http://localhost:8080/order/confirm');
+  params.append('billReturnUrl', 'https://toyyibfnb.com/order/confirm');
   params.append('billCallbackUrl', 'https://toyyibfnb.com/api/tbl/callbackPayment');/* https://toyyibfnb.com/api/tbl/tblorderCallbackURL */
   params.append('billExternalReferenceNo', orderNo); /* Order No ORDER */
   params.append('billTo', billTo);
