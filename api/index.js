@@ -1,6 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
+/* ADMIN */
+router.use("/admin/login", require("./Admin/login.js"));
+router.use("/admin/dashboard", require("./Admin/dashboard.js"));
+router.use("/admin/getUser", require("./Admin/getUser.js"));
+router.use("/admin/insertUser", require("./Admin/insertUser.js"));
+
+
 // * * * * * * * *  TABLE ORDER * * * * * * * * //
 /* CATEGORIES */
 router.use("/tbl/getCategory", require("./Category/getCategory.js"));
@@ -13,6 +20,7 @@ router.use('/tbl/updateOrdertbl', require("./Order/updateOrdertbl.js"));
 router.use('/tbl/getOrder', require("./Order/getOrder.js"));
 router.use('/tbl/getOrderCart', require("./Order/getOrderCart.js"));
 router.use('/tbl/getOrderConfirm', require("./Order/getOrderConfirm.js"));
+router.use('/tbl/getPreviousOrder', require("./Order/getPreviousOrder.js"));
 
 router.use("/tbl/insertOrder", require("./Order/insertOrder.js"));
 router.use("/tbl/updateOrdertbl", require("./Order/updateOrdertbl.js"));

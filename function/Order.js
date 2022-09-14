@@ -643,6 +643,21 @@ async function getOrderCartPOS(order_no) {
   return result[0];
 }
 
+async function getPreviousOrder(orderID) {
+  let result = null;
+  let sql = null;
+
+  result = await knex
+    .connect("order")
+    .select(
+      "orderTotalAmount as order_total",
+      "orderDetail as order_detail",
+    )
+    .where("orderNo", orderID);
+
+  return result;
+}
+
 module.exports = {
   insertOrder,
   insertmenuOrder,
@@ -658,4 +673,5 @@ module.exports = {
   getOrderConfirm,
   getOrderPending,
   getOrderCartPOS,
+  getPreviousOrder,
 };
