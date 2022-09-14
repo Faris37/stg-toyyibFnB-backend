@@ -25,12 +25,12 @@ async function insertOrder(total, order, table) {
     if (total >= 70) {
       discountOutlet = total * 0.1;
     } else {
-      discountOutlet = 0;
+      discountOutlet = 0.00;
     }
     if (mmberDisc != "") {
       mmbrDisc = total * 0.07;
     } else {
-      mmbrDisc = 0;
+      mmbrDisc = 0.00;
     }
     Discount = discountOutlet + mmbrDisc;
     var totalAmount = total + tax  - Discount;
@@ -75,7 +75,7 @@ async function insertOrder(total, order, table) {
       orderTableNo: table,
       orderDiscount: Discount,
       orderTax: tax,
-      
+      orderServiceCharge: 0.00,
     });
 
     if (!sql || sql.length == 0) {
