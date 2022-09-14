@@ -18,6 +18,8 @@ router.post("/", async (req, res) => {
     let discount = param.discount;
     let order_no = param.order_no;
     let type = param.type;
+    let order_takeaway = param.orderTakeAway;
+    let order_typeId = param.orderTypeId;
 
     let updateOrder = await model.updateOrderPOS(
       amt,
@@ -25,10 +27,11 @@ router.post("/", async (req, res) => {
       order,
       discount,
       order_no,
-      type
+      type,
+      order_takeaway
     );
 
-    let updateMenuOrder = await model.updateMenuOrderPOS(order, updateOrder, type);
+    let updateMenuOrder = await model.updateMenuOrderPOS(order, updateOrder, type, order_takeaway, order_typeId);
 
     if (updateOrder || updateMenuOrder) {
       result = {
