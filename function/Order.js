@@ -15,7 +15,6 @@ async function insertOrder(total, order, table) {
       .where("referenceValue", 3)
       .andWhere("referenceRefCode", 4);
 
-
     var mmberDisc = order[0].membership_no;
 
     var discountOutlet = 0;
@@ -25,14 +24,12 @@ async function insertOrder(total, order, table) {
     /* var service = total * 0.1; */
     if (total >= 70) {
       discountOutlet = total * 0.1;
-    }
-    else {
+    } else {
       discountOutlet = 0;
     }
     if (mmberDisc != "") {
       mmbrDisc = total * 0.07;
-    }
-    else {
+    } else {
       mmbrDisc = 0;
     }
     Discount = discountOutlet + mmbrDisc;
@@ -49,6 +46,16 @@ async function insertOrder(total, order, table) {
       custPhone = "Guest"
     }
 
+    var custName = order[0].custName;
+    var custPhone = order[0].custPhone;
+    if(custName == "")
+    {
+      custName = "Guest";
+    }
+    if(custPhone == "")
+    {
+      custPhone = "Guest"
+    }
 
     let orderNo = await generateOrderID(4).then((res) => {
       return res;
@@ -231,7 +238,11 @@ async function getOrderPOS() {
         "orderDatetime AS order_date",
         "orderNo AS order_no",
         "orderTotalAmount AS order_total_amount",
-        "orderDetail AS order_detail"
+        "orderDetail AS order_detail",
+        "transactionTax as tax",
+        "transactionServiceCharge as service_charge",
+        "transactionDiscount as discount",
+        "transactionAmountNett as amountNett"
       );
 
     if (!sql || sql.length == 0) {
@@ -308,7 +319,8 @@ async function insertOrderPOS(
   order,
   staff_id,
   counter_key,
-  discount
+  discount,
+  order_takeaway
 ) {
   let result = null;
   let tax = amount * 0.06;
@@ -318,6 +330,30 @@ async function insertOrderPOS(
   let orderNo = await generateOrderID(4).then((res) => {
     return res;
   });
+
+  let arrayOrder = [];
+
+  if (order_takeaway.length > 0) {
+    let orderConcat = order.map((item) => {
+      let result = order_takeaway.map((item2) => {
+        if (item.menu_id == item2.menu_id) {
+          return {
+            ...item,
+            menu_quantity: item.menu_quantity + item2.menu_quantity,
+          };
+        } else {
+          return item;
+        }
+      });
+
+      console.log("result :", result[0]);
+      arrayOrder.push(result[0]);
+
+      return arrayOrder;
+    });
+  }
+
+  console.log("arrayOrder :", arrayOrder);
 
   let sqlGetStatusCompleted = await knex
     .connect("reference")
@@ -338,6 +374,7 @@ async function insertOrderPOS(
     .andWhere("counterStatusCode", 1);
 
   //   console.log(orderId);
+
   try {
     let sql = await knex.connect("order").insert({
       orderNo: orderNo,
@@ -347,10 +384,14 @@ async function insertOrderPOS(
       orderTotalAmount: totalAmount,
       orderCustomerName: "Customer Name",
       orderCustomerPhoneNo: "Customer Phone",
-      orderDetail: JSON.stringify(order),
+      orderDetail:
+        order_takeaway.length > 0
+          ? JSON.stringify(arrayOrder)
+          : JSON.stringify(order),
       orderDiscount: discount,
       orderTax: tax,
       orderServiceCharge: 0,
+      orderFrom: "POS",
       fkStaffId: staff_id,
       fkCounterId: sqlGetCounter[0].counterId,
     });
@@ -367,15 +408,15 @@ async function insertOrderPOS(
   return result;
 }
 
-async function insertmenuOrderPOS(order, orderNo) {
+async function insertmenuOrderPOS(
+  order,
+  orderNo,
+  order_takeaway,
+  order_typeId
+) {
   let result = null;
   let sql = null;
-
-  let sqlGetStatusCompleted = await knex
-    .connect("reference")
-    .select("referenceName", "referenceValue")
-    .where("referenceValue", 1)
-    .andWhere("referenceRefCode", 4);
+  let sql_takeaway = null;
 
   let sqlGetStatusInCart = await knex
     .connect("reference")
@@ -388,6 +429,12 @@ async function insertmenuOrderPOS(order, orderNo) {
     .select("orderId")
     .where("orderNo", orderNo);
 
+  let sqlGetTypeOrder = await knex
+    .connect("reference")
+    .select("referenceName", "referenceValue")
+    .where("referenceValue", order_typeId)
+    .andWhere("referenceRefCode", 9);
+
   try {
     for (let i = 0; i < order.length; i++) {
       sql = await knex.connect("menu_order").insert({
@@ -396,11 +443,27 @@ async function insertmenuOrderPOS(order, orderNo) {
         menuOrderStatusRefName: sqlGetStatusInCart[0].referenceName,
         menuOrderPrice: order[i].menu_price,
         menuOrderDetail: order[i],
-        // menuOrderTypeOrderRefCode: order[i].refOrderType,
-        // menuOrderTypeOrderRefName: order[i].orderType,
+        menuOrderTypeOrderRefCode: sqlGetTypeOrder[0].referenceValue,
+        menuOrderTypeOrderRefName: sqlGetTypeOrder[0].referenceName,
         fkOrderId: sqlGetOrderId[0].orderId,
         fkMenuId: order[i].menu_id,
       });
+    }
+
+    if (order_takeaway.length > 0) {
+      for (let i = 0; i < order_takeaway.length; i++) {
+        sql_takeaway = await knex.connect("menu_order").insert({
+          menuOrderQuantity: order_takeaway[i].menu_quantity,
+          menuOrderStatusCode: sqlGetStatusInCart[0].referenceValue,
+          menuOrderStatusRefName: sqlGetStatusInCart[0].referenceName,
+          menuOrderPrice: order_takeaway[i].menu_price,
+          menuOrderDetail: order_takeaway[i],
+          menuOrderTypeOrderRefCode: 2,
+          menuOrderTypeOrderRefName: "Take Away",
+          fkOrderId: sqlGetOrderId[0].orderId,
+          fkMenuId: order_takeaway[i].menu_id,
+        });
+      }
     }
 
     if (!sql || sql.length == 0) {
@@ -421,7 +484,8 @@ async function updateOrderPOS(
   order,
   discount,
   order_no,
-  type
+  type,
+  order_takeaway
 ) {
   let result = null;
   let tax = amount * 0.06;
@@ -443,6 +507,28 @@ async function updateOrderPOS(
     .select("orderStatusCode")
     .where("orderNo", orderNo);
 
+  let arrayOrder = [];
+
+  if (order_takeaway.length > 0) {
+    let orderConcat = order.map((item) => {
+      let result = order_takeaway.map((item2) => {
+        if (item.menu_id == item2.menu_id) {
+          return {
+            ...item,
+            menu_quantity: item.menu_quantity + item2.menu_quantity,
+          };
+        } else {
+          return item;
+        }
+      });
+
+      console.log("result :", result[0]);
+      arrayOrder.push(result[0]);
+
+      return arrayOrder;
+    });
+  }
+
   if (type == "payment") {
     status = 1;
   } else if (type == "edit") {
@@ -462,7 +548,7 @@ async function updateOrderPOS(
         orderDatetime: getDateTime(),
         orderAmount: amount,
         orderTotalAmount: totalAmount,
-        orderDetail: JSON.stringify(order),
+        orderDetail: order_takeaway.length > 0 ? JSON.stringify(arrayOrder) : JSON.stringify(order),
         orderDiscount: discount,
         orderTax: tax,
         orderServiceCharge: 0,
@@ -481,7 +567,13 @@ async function updateOrderPOS(
   return result;
 }
 
-async function updateMenuOrderPOS(order, orderNo, type) {
+async function updateMenuOrderPOS(
+  order,
+  orderNo,
+  type,
+  order_takeaway,
+  order_typeId
+) {
   let result = null;
   let sql = null;
   let sqlNotExist = null;
@@ -501,6 +593,12 @@ async function updateMenuOrderPOS(order, orderNo, type) {
       .where("referenceValue", 3)
       .andWhere("referenceRefCode", 4);
   }
+
+  let sqlGetTypeOrder = await knex
+    .connect("reference")
+    .select("referenceName", "referenceValue")
+    .where("referenceValue", order_typeId)
+    .andWhere("referenceRefCode", 9);
 
   let sqlGetOrderId = await knex
     .connect("order")
@@ -555,8 +653,8 @@ async function updateMenuOrderPOS(order, orderNo, type) {
             menuOrderStatusRefName: sqlGetStatusOrder[0].referenceName,
             menuOrderPrice: orderExist[i].menu_price,
             menuOrderDetail: JSON.stringify(orderExist[i]),
-            // menuOrderTypeOrderRefCode: order[i].refOrderType,
-            // menuOrderTypeOrderRefName: order[i].orderType,
+            menuOrderTypeOrderRefCode: sqlGetTypeOrder[0].referenceValue,
+            menuOrderTypeOrderRefName: sqlGetTypeOrder[0].referenceName,
             // fkMenuId: orderExist[i].menu_id,
           })
           .where("fkOrderId", sqlGetOrderId[0].orderId)
@@ -572,11 +670,84 @@ async function updateMenuOrderPOS(order, orderNo, type) {
           menuOrderStatusRefName: sqlGetStatusOrder[0].referenceName,
           menuOrderPrice: orderNotExist[i].menu_price,
           menuOrderDetail: JSON.stringify(orderNotExist[i]),
-          // menuOrderTypeOrderRefCode: order[i].refOrderType,
-          // menuOrderTypeOrderRefName: order[i].orderType,
+          menuOrderTypeOrderRefCode: sqlGetTypeOrder[0].referenceValue,
+          menuOrderTypeOrderRefName: sqlGetTypeOrder[0].referenceName,
           fkOrderId: sqlGetOrderId[0].orderId,
           fkMenuId: orderNotExist[i].menu_id,
         });
+      }
+    }
+
+    if (order_takeaway.length > 0) {
+      let orderExist_takeaway = order_takeaway.filter((item) => {
+        return sqlGetMenuOrder.some((item2) => {
+          return item2.menu_id === item.menu_id;
+        });
+      });
+
+      let orderNotExist_takeaway = order_takeaway.filter((item) => {
+        return !sqlGetMenuOrder.some((item2) => {
+          return item2.menu_id === item.menu_id;
+        });
+      });
+
+      let menuOrderExistCancel_takeaway = sqlGetMenuOrder.filter((item) => {
+        return !orderExist.some((item2) => {
+          return item2.menu_id === item.menu_id;
+        });
+      });
+
+      try {
+        if (menuOrderExistCancel_takeaway.length > 0) {
+          for (let i = 0; i < menuOrderExistCancel_takeaway.length; i++) {
+            sqlCancel = await knex
+              .connect("menu_order")
+              .update({
+                menuOrderStatusCode: 4,
+                menuOrderStatusRefName: "Cancelled",
+              })
+              .where(
+                "menuOrderId",
+                menuOrderExistCancel_takeaway[i].menuOrderId
+              );
+          }
+        }
+
+        if (orderExist_takeaway.length > 0) {
+          for (let i = 0; i < orderExist.length; i++) {
+            sql = await knex
+              .connect("menu_order")
+              .update({
+                menuOrderQuantity: orderExist_takeaway[i].menu_quantity,
+                menuOrderStatusCode: sqlGetStatusOrder[0].referenceValue,
+                menuOrderStatusRefName: sqlGetStatusOrder[0].referenceName,
+                menuOrderPrice: orderExist_takeaway[i].menu_price,
+                menuOrderDetail: JSON.stringify(orderExist_takeaway[i]),
+                menuOrderTypeOrderRefCode: 2,
+                menuOrderTypeOrderRefName: "Take Away",
+              })
+              .where("fkOrderId", sqlGetOrderId[0].orderId)
+              .andWhere("fkMenuId", orderExist_takeaway[i].menu_id);
+          }
+        }
+
+        if (orderNotExist_takeaway.length > 0) {
+          for (let i = 0; i < orderNotExist_takeaway.length; i++) {
+            sqlNotExist = await knex.connect("menu_order").insert({
+              menuOrderQuantity: orderNotExist_takeaway[i].menu_quantity,
+              menuOrderStatusCode: sqlGetStatusOrder[0].referenceValue,
+              menuOrderStatusRefName: sqlGetStatusOrder[0].referenceName,
+              menuOrderPrice: orderNotExist_takeaway[i].menu_price,
+              menuOrderDetail: JSON.stringify(orderNotExist_takeaway[i]),
+              menuOrderTypeOrderRefCode: 2,
+              menuOrderTypeOrderRefName: "Take Away",
+              fkOrderId: sqlGetOrderId[0].orderId,
+              fkMenuId: orderNotExist_takeaway[i].menu_id,
+            });
+          }
+        }
+      } catch (error) {
+        console.log(error);
       }
     }
 
@@ -658,6 +829,59 @@ async function getPreviousOrder(orderID) {
   return result;
 }
 
+async function cancelOrderPOS(order_no) {
+  let result = null;
+  let sql = null;
+
+  try {
+    sql = await knex
+      .connect("order")
+      .update({
+        orderStatusCode: 4,
+      })
+      .where("orderNo", order_no);
+
+    if (!sql || sql.length == 0) {
+      result = false;
+    } else {
+      result = sql;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function cancelMenuOrderPOS(order_no) {
+  let result = null;
+  let sql = null;
+
+  let sqlGetOrderId = await knex
+    .connect("order")
+    .select("orderId")
+    .where("orderNo", order_no);
+
+  try {
+    sql = await knex
+      .connect("menu_order")
+      .update({
+        menuOrderStatusCode: 4,
+      })
+      .where("fkOrderId", sqlGetOrderId[0].orderId);
+
+    if (!sql || sql.length == 0) {
+      result = false;
+    } else {
+      result = sql;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
 module.exports = {
   insertOrder,
   insertmenuOrder,
@@ -673,5 +897,7 @@ module.exports = {
   getOrderConfirm,
   getOrderPending,
   getOrderCartPOS,
+  cancelOrderPOS,
+  cancelMenuOrderPOS,
   getPreviousOrder,
 };
