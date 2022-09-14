@@ -16,6 +16,8 @@ router.post("/", async (req, res) => {
     let tableId = param.tableId;
     let counter = param.counter;
     let discount = param.discount;
+    let order_takeaway = param.orderTakeAway;
+    let order_typeId = param.orderTypeId;
 
     let insertOrder = await model.insertOrderPOS(
       amt,
@@ -23,10 +25,11 @@ router.post("/", async (req, res) => {
       order,
       staffId,
       counter,
-      discount
+      discount,
+      order_takeaway,
     );
 
-    let insertmenuOrder = await model.insertmenuOrderPOS(order, insertOrder);
+    let insertmenuOrder = await model.insertmenuOrderPOS(order, insertOrder, order_takeaway, order_typeId);
 
     if (insertOrder || insertmenuOrder != false) {
       result = {
