@@ -20,10 +20,12 @@ router.post("/", async (req, res) => {
     let ccInvoiceNo = param.cc_invoiceNo;
     let order_no = param.order_no;
     let order = param.order.order;
+    let order_takeaway = [];
+    let order_typeId = param.orderTypeId;
 
     // order = JSON.parse(order.order);
+    console.log("order", order);
 
-    console.log(order);
     let insertPayment = await model.insertPaymentPOS(
       amount,
       totalAmount,
@@ -41,14 +43,25 @@ router.post("/", async (req, res) => {
       order,
       discount,
       order_no,
-      'payment'
+      "payment",
+      order_takeaway
     );
 
-    let updateMenuOrder = await modelOrder.updateMenuOrderPOS(order, updateOrder, 'payment');
+    let updateMenuOrder = await modelOrder.updateMenuOrderPOS(
+      order,
+      updateOrder,
+      "payment",
+      order_takeaway,
+      order_typeId
+    );
 
     // update order & menu order
 
-    if (insertPayment != false || updateOrder != false || updateMenuOrder != false) {
+    if (
+      insertPayment != false ||
+      updateOrder != false ||
+      updateMenuOrder != false
+    ) {
       result = {
         status: 200,
         message: "Success",

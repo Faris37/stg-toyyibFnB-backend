@@ -9,35 +9,17 @@ router.post("/", async (req, res) => {
   try {
     // BIND PARAMETER TO VARIABLES
     param = req.body;
-    let order = param.order;
-    let totalAmount = param.totalAmt;
-    let amt = param.amt;
-    let staffId = param.staff;
-    let tableId = param.tableId;
-    let counter = param.counter;
-    let discount = param.discount;
     let order_no = param.order_no;
-    let type = param.type;
-    let order_takeaway = param.orderTakeAway;
-    let order_typeId = param.orderTypeId;
 
-    let updateOrder = await model.updateOrderPOS(
-      amt,
-      totalAmount,
-      order,
-      discount,
-      order_no,
-      type,
-      order_takeaway
-    );
+    let cancelOrder = await model.cancelOrderPOS(order_no);
 
-    let updateMenuOrder = await model.updateMenuOrderPOS(order, updateOrder, type, order_takeaway, order_typeId);
+    let cancelMenuOrder = await model.cancelMenuOrderPOS(order_no);
 
-    if (updateOrder || updateMenuOrder) {
+    if (cancelOrder || cancelMenuOrder) {
       result = {
         status: 200,
         message: "Success Update",
-        data: updateOrder,
+        data: cancelOrder,
       };
     } else {
       result = {
