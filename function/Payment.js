@@ -303,12 +303,13 @@ async function tblorderPaymentPOS(
       .where("orderId", orderID)
       .update({
         orderStatusCode: 2,
-        /* orderDiscount: discount,
-        orderTax: tax,
-        orderServiceCharge: serviceCharge, */
         fkCounterId: 1,
         orderFrom: "Table"
       });
+
+      /* orderDiscount: discount,
+        orderTax: tax,
+        orderServiceCharge: serviceCharge, */
 
     let sqlOrderNO = await knex
       .connect("order")
