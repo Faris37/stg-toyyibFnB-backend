@@ -31,17 +31,18 @@ router.use("/tbl/getOrderCart", require("./Order/getOrderCart.js"));
 router.use("/tbl/getMembership", require("./Membership/getMembership.js"));
 /* PAYMENT */
 
-router.use('/tbl/tblorderPayment', require("./Payment/tblorderPayment.js"));
-router.use('/tbl/callbackPayment', require("./Payment/tblorderCallbackURL.js"));
-router.use('/tbl/tblOrderPOS', require("./Payment/tblorderPaymentPOS.js"));
-
+router.use("/tbl/tblorderPayment", require("./Payment/tblorderPayment.js"));
+router.use("/tbl/callbackPayment", require("./Payment/tblorderCallbackURL.js"));
+router.use("/tbl/tblOrderPOS", require("./Payment/tblorderPaymentPOS.js"));
 
 router.use("/tbl/tblorderPayment", require("./Payment/tblorderPayment.js"));
 router.use("/tbl/callbackPayment", require("./Payment/tblorderCallbackURL.js"));
 
-
 // * * * * * * * *  LOGIN * * * * * * * * //
 router.use("/loginStaff", require("./LoginStaff/loginStaff.js"));
+
+// * * * * * * * *  MEMBERSHIP  * * * * * * * * //
+router.use("/pos/getMembership", require("./Membership/getMembershipPOS.js"));
 
 // * * * * * * * *  TYPE ORDER * * * * * * * * //
 router.use("/getTypeOrder", require("./Reference/getTypeOrder.js"));
@@ -52,15 +53,17 @@ router.use("/pos/updateOrder", require("./Order/updateOrderPOS.js"));
 router.use("/pos/getOrderList", require("./Order/getOrderPOS.js"));
 router.use("/pos/getOrderPending", require("./Order/getOrderPending.js"));
 router.use("/pos/getOrderCartPOS", require("./Order/getOrderCartPOS.js"));
+router.use("/pos/cancelOrder", require("./Order/cancelOrderPOS.js"));
 
 // * * * * * * * *  PAYMENT ORDER POS * * * * * * * * //
 router.use("/pos/paymentOrder", require("./Payment/insertPaymentPOS.js"));
+router.use("/getPaymentMethod", require("./Payment/getPaymentMethod.js"));
+router.use("/getPaymentStatus", require("./Payment/getPaymentStatus.js"));
+router.use("/pos/refund", require("./Payment/updateRefund.js"));
 
 // * * * * * * * *  SHIFT  * * * * * * * * //
 router.use("/pos/insertShift", require("./Shift/insertShift.js"));
 router.use("/pos/getShift", require("./Shift/getShift.js"));
 router.use("/pos/updateShift", require("./Shift/updateShift.js"));
-
-
 
 module.exports = router;
