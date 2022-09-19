@@ -307,6 +307,16 @@ async function tblorderPaymentPOS(
         orderFrom: "Table"
       });
 
+    let sqlUpdateMenuOrder = await knex
+    .connect("menu_order")
+    .where("fkOrderId", orderID)
+    .update(
+      {
+        menuOrderStatusRefName : "Pending",
+        menuOrderStatusCode: 2
+      }
+    );
+
       /* orderDiscount: discount,
         orderTax: tax,
         orderServiceCharge: serviceCharge, */

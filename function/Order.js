@@ -100,6 +100,17 @@ async function insertmenuOrder(order, insertOrder) {
         .select("referenceName", "referenceValue")
         .where("referenceValue", 3)
         .andWhere("referenceRefCode", 4);
+      
+      let menutype = order[i].orderType;
+      let insertMenuType = "";
+      if(menutype == 1)
+      {
+        insertMenuType = "Dine in";
+      }
+      else if(menutype == 2)
+      {
+        insertMenuType = "Take Away";
+      }
 
       let sql = await knex.connect("menu_order").insert({
         menuOrderQuantity: order[i].menu_quantity,
@@ -110,6 +121,7 @@ async function insertmenuOrder(order, insertOrder) {
         fkOrderId: insertOrder,
         fkMenuId: order[i].menu_id,
         menuOrderTypeOrderRefCode: order[i].orderType,
+        menuOrderTypeOrderRefName: insertMenuType,
         menuOrderRemark: order[i].remarks,
       });
       console.log("Insert Menu Order: ", sql);
