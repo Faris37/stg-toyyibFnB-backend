@@ -103,11 +103,11 @@ async function insertmenuOrder(order, insertOrder) {
       
       let menutype = order[i].orderType;
       let insertMenuType = "";
-      if(menutype == 1)
+      if(menutype == 1 || menutype == "1")
       {
         insertMenuType = "Dine in";
       }
-      else if(menutype == 2)
+      else if(menutype == 2 || menutype == "2")
       {
         insertMenuType = "Take Away";
       }
