@@ -239,6 +239,7 @@ async function getOrderPOS() {
   try {
     sql = await knex
       .connect("order")
+      .leftJoin("staff", "staff.staffId", "order.fkStaffId")
       .join("transaction", "order.orderId", "transaction.fkOrderId")
       .select(
         "transactionInvoiceNo AS invoice_no",
@@ -254,7 +255,11 @@ async function getOrderPOS() {
         "transactionTax as tax",
         "transactionServiceCharge as service_charge",
         "transactionDiscount as discount",
-        "transactionAmountNett as amountNett"
+        "transactionAmountNett as amountNett",
+        "staffName AS staff_name",
+        "staffPhoneNo AS staff_phone_no",
+        "staffEmail AS staff_email",
+        "staffId AS staff_id",
       );
 
     if (!sql || sql.length == 0) {
@@ -819,7 +824,10 @@ async function getOrderCartPOS(order_no) {
       "orderTotalAmount as totalAmt",
       "orderDiscount as discount",
       "orderTax as tax",
-      "orderServiceCharge as serviceCharge"
+      "orderServiceCharge as serviceCharge",
+      "orderCustomerName as customerName",
+      "orderCustomerPhoneNo as customerPhoneNo",
+      "orderTableNo as tableNo",
     )
     .where(`orderNo`, order_no);
 
@@ -869,6 +877,12 @@ async function cancelMenuOrderPOS(order_no) {
   let result = null;
   let sql = null;
 
+  let sqlGetStatusOrder = await knex
+  .connect("reference")
+  .select("referenceName", "referenceValue")
+  .where("referenceValue", 4)
+  .andWhere("referenceRefCode", 4);
+
   let sqlGetOrderId = await knex
     .connect("order")
     .select("orderId")
@@ -878,9 +892,40 @@ async function cancelMenuOrderPOS(order_no) {
     sql = await knex
       .connect("menu_order")
       .update({
-        menuOrderStatusCode: 4,
+        menuOrderStatusCode: sqlGetStatusOrder[0].referenceValue,
+        menuOrderStatusRefName: sqlGetStatusOrder[0].referenceName,
       })
       .where("fkOrderId", sqlGetOrderId[0].orderId);
+
+    if (!sql || sql.length == 0) {
+      result = false;
+    } else {
+      result = sql;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function getOrderDetailsPOS(order_no) {
+  let result = null;
+  let sql = null;
+
+  try {
+    sql = await knex
+      .connect("order")
+      .join("menu_order", "order.orderId", "menu_order.fkOrderId")
+      .select(
+        "orderNo as order_no",
+        "orderStatusCode as order_status",
+        "orderTableNo as order_tableNo",
+        "menuOrderDetail as menu_order_detail",
+        "menuOrderTypeOrderRefCode as order_typeId",
+        "menuOrderTypeOrderRefName as order_typeName",
+      )
+      .where("orderNo", order_no);
 
     if (!sql || sql.length == 0) {
       result = false;
@@ -912,4 +957,5 @@ module.exports = {
   cancelOrderPOS,
   cancelMenuOrderPOS,
   getPreviousOrder,
+  getOrderDetailsPOS
 };
