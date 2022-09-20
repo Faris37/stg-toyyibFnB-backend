@@ -4,9 +4,8 @@ async function getTypeOrder() {
   let result = null;
   result = await knex
     .connect("reference")
-    .select("referenceValue as id", "referenceName as title")
-    .where("referenceRefCode", 9)
-    .andWhere("referenceStatusCode", 1);
+    .select("referenceValue as id", "referenceName as title", "referenceStatusCode as status")
+    .where("referenceRefCode", 9);
   console.log(result);
 
   return result;
