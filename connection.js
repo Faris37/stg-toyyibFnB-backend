@@ -3,11 +3,11 @@ const Knex = require("knex");
 const mysql = require("mysql");
 
 let database = null;
-const host = "13.250.76.154";
+const host = "18.136.164.208";
 const user = "admin";
 const password = "Xs2mysql_admin_ski";
 
-if (process.env.ENVIRONMENT == "development") database = "dev-toyyibfnb";
+if (process.env.ENVIRONMENT == "development") database = "stg-heandshe";
 if (process.env.ENVIRONMENT == "demo") database = "ski_demo";
 if (process.env.ENVIRONMENT == "production") database = "ski_prod";
 
