@@ -11,6 +11,8 @@ router.post("/", async (req, res) => {
     param = req.body;
     let order_no = param.order_no;
 
+    console.log('order_noqqq', order_no);
+
     let cancelOrder = await model.cancelOrderPOS(order_no);
 
     let cancelMenuOrder = await model.cancelMenuOrderPOS(order_no);
