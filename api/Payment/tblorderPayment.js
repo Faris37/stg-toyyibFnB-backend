@@ -57,7 +57,7 @@ router.post("/", async (req, res) => {
         else {
             console.log('BILL CODE RETURNED FROM TOYYIBPAY => ' + createBill)
 
-            data2 = process.env.REDIRECT_PAYMENT_PAGE + createBill; //local atau staging
+            data2 = process.env.DEV_REDIRECT_PAYMENT_PAGE + createBill; //local atau staging
             // data2 = process.env.REDIRECT_PAYMENT_PAGE + createBill + '?billBankID=' + selectedBank; //production
             console.log("data 2: ", data2)
         }

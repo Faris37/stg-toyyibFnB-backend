@@ -39,7 +39,8 @@ router.post("/", parseMultiPart, async (req, res) => {
 
     let updatePaymentTable = await model.updatePaymentTable(
       billcode,
-      status
+      status,
+      order_id
     );
 
     /* UPDATE */

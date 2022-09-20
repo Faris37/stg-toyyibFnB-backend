@@ -119,27 +119,20 @@ async function createBill(
   const params = new URLSearchParams();
 
   // required data
-  params.append("userSecretKey", process.env.SECRET_KEY); /* LETAK ENV */
-  params.append("categoryCode", process.env.CATEGORY_CODE);
+  params.append("userSecretKey", process.env.DEV_SECRET_KEY); /* LETAK ENV */
+  params.append("categoryCode", process.env.DEV_CATEGORY_CODE);
   params.append("billName", billName);
   params.append("billDescription", billDesc);
   params.append("billPriceSetting", 1);
   params.append("billPayorInfo", 0);
 
   params.append('billAmount', billAmount);
-  params.append('billReturnUrl', 'https://toyyibfnb.com/order/confirm');
+  params.append('billReturnUrl', 'https://toyyibfnb.com/order/confirm');/*  */
   params.append('billCallbackUrl', 'https://toyyibfnb.com/api/tbl/callbackPayment');/* https://toyyibfnb.com/api/tbl/tblorderCallbackURL */
   params.append('billExternalReferenceNo', orderNo); /* Order No ORDER */
   params.append('billTo', billTo);
   params.append('billEmail', 'Farisizwanfauzi@gmail.com');
   params.append('billPhone', billPhone);
-
-  /* params.append('billAmount', billAmount); */
-  // params.append('billReturnUrl', 'http://bizapp.my');
-  /* params.append('billCallbackUrl', 'http://localhost:3000/tbl/callbackPayment'); */
-  params.append("billTo", "test");
-  params.append("billEmail", "hishamudin.ali@gmail.com");
-  params.append("billPhone", "0123123123");
 
   params.append("billPaymentChannel ", 1);
   params.append("billChargeToCustomer", 1);
@@ -151,7 +144,7 @@ async function createBill(
     .then(function (response) { */
 
   await axios
-    .post("https://toyyibpay.com/index.php/api/createBill", params)
+    .post(process.env.CREATE_BILL , params)
     .then(function (response) {
       console.log(response.data);
       result = response.data[0].BillCode;
@@ -172,7 +165,11 @@ async function createBill(
       return res;
     }
   );
-
+    if(discount == "" || discount == null)
+    {
+      discount = 0;
+    }
+  
   try {
     let sql = await knex.connect("transaction").insert({
       transactionInvoiceNo: invoiceNo,
@@ -205,52 +202,65 @@ async function createBill(
   /* }) */
 }
 
-async function updatePaymentTable(billcode, status) {
+async function updatePaymentTable(billcode, status, order_id) {
   let result = null;
 
   try {
     let statusSelect = null;
+    let statusOrder = null;
 
-    if (status == 1) {
+    if (status == 1 || status == 2) {
       statusSelect = await knex
         .connect("reference")
         .select("referenceValue", "referenceName")
         .where("referenceRefCode", 16)
         .andWhere("referenceValue", 1);
-    } else if (status == 2) {
+
+        statusOrder = await knex
+      .connect("reference")
+      .select("referenceValue", "referenceName")
+      .where("referenceRefCode", 4)
+      .andWhere("referenceValue", 1);
+    } /* else if (status == 2) {
       statusSelect = await knex
         .connect("reference")
         .select("referenceValue", "referenceName")
         .where("referenceRefCode", 16)
-        .andWhere("referenceValue", 2);
-    } else if (status == 3) {
+        .andWhere("referenceValue", 1);
+    }  */
+    else if (status == 3) {
       statusSelect = await knex
         .connect("reference")
         .select("referenceValue", "referenceName")
         .where("referenceRefCode", 16)
         .andWhere("referenceValue", 3);
+      
+      statusOrder = await knex
+      .connect("reference")
+      .select("referenceValue", "referenceName")
+      .where("referenceRefCode", 4)
+      .andWhere("referenceValue", 4);
     }
 
+    let updateOrder = await knex.connect("order")
+    .update({ orderStatusCode: statusOrder[0].referenceValue, })
+    .where("order.orderNo", order_id)
+
+    let sqlSelect = await knex.connect("order")
+      .select("orderId")
+      .where("order.orderNo", order_id);
+    
     let sql = await knex.connect("transaction").update({
       transactionStatusCode: statusSelect[0].referenceValue,
       paymentDatetimeCallback: getDateTime(),
-    }).where("tpBillCode", billcode);
-
-    let updateOrder = await knex.connect("order")
-      .join("transaction", "order.orderId", "=", "transaction.fkOrderID")
-      .update({ orderStatusCode: statusSelect[0].referenceValue, })
-      .where("transaction.tpBillCode", billcode)
-
-    let sqlSelect = await knex.connect("transaction")
-      .select("fkOrderID")
-      .where("tpBillCode", billcode);
+    }).where("fkOrderID", sqlSelect[0].orderId);
 
     let sqlmenu_order = await knex.connect("menu_order")
       .update({
-        menuOrderStatusRefName: "Completed",
-        menuOrderStatusCode: 1
+        menuOrderStatusRefName: statusOrder[0].referenceName,
+        menuOrderStatusCode: statusOrder[0].referenceValue
       })
-      .where("fkOrderId", sqlSelect[0].fkOrderID)
+      .where("fkOrderId", sqlSelect[0].orderId)
       .andWhere("menuOrderStatusCode", 3);
 
     if (!updateOrder || updateOrder.length == 0) {
