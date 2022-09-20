@@ -19,6 +19,8 @@ router.post("/", async (req, res) => {
     let order_takeaway = param.orderTakeAway;
     let order_typeId = param.orderTypeId;
 
+    console.log('ordertype id', order_typeId);
+
     let insertOrder = await model.insertOrderPOS(
       amt,
       totalAmount,
