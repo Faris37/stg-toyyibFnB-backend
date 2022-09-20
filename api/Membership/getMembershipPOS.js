@@ -16,12 +16,13 @@ router.post("/", async (req, res) => {
 
     console.log("membership_no", membership_no);
 
-    let getMembership = await model.getMembership(membership_no);
+    let getMembership = await model.getMembershipPOS(membership_no);
 
     if (getMembership != false) {
       result = {
         status: 200,
         message: 'Success',
+        data : getMembership
       };
     } else {
       result = {
