@@ -54,6 +54,7 @@ router.use("/pos/getOrderList", require("./Order/getOrderPOS.js"));
 router.use("/pos/getOrderPending", require("./Order/getOrderPending.js"));
 router.use("/pos/getOrderCartPOS", require("./Order/getOrderCartPOS.js"));
 router.use("/pos/cancelOrder", require("./Order/cancelOrderPOS.js"));
+router.use("/pos/getOrderDetails", require("./Order/getOrderDetailsPOS.js"));
 
 // * * * * * * * *  PAYMENT ORDER POS * * * * * * * * //
 router.use("/pos/paymentOrder", require("./Payment/insertPaymentPOS.js"));
@@ -65,5 +66,6 @@ router.use("/pos/refund", require("./Payment/updateRefund.js"));
 router.use("/pos/insertShift", require("./Shift/insertShift.js"));
 router.use("/pos/getShift", require("./Shift/getShift.js"));
 router.use("/pos/updateShift", require("./Shift/updateShift.js"));
+router.use("/pos/getNetSales", require("./Shift/getNetSales.js"));
 
 module.exports = router;
