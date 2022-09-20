@@ -23,7 +23,6 @@ router.post("/", async (req, res) => {
       };
     } else if (getShift == false) {
       result = {
-        status: 200,
         message: "No data",
       };
     }
@@ -36,7 +35,7 @@ router.post("/", async (req, res) => {
   }
 
   // RETURN
-  res.status(result.status).json(result);
+  res.status(200).json(result);
 });
 
 module.exports = router;
