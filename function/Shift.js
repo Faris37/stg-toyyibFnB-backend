@@ -99,6 +99,8 @@ async function updateShift(shift_id, cash_open, type) {
   let result = null;
   let sql = null;
   let sqlGetDetails = null;
+  let sqlGetNetSales = null;
+  let sqlRefund = null;
 
   let totalAmountCash = 0;
 
@@ -181,13 +183,56 @@ async function updateShift(shift_id, cash_open, type) {
         })
         .where("shiftId", shift_id);
     } else {
+      let getStartDate = await knex
+        .connect("shift")
+        .select(
+          "shiftStartDatetime as shift_startDatetime",
+          "shiftOpenTotalAmount as shift_openTotalAmount"
+        )
+        .where("shiftId", shift_id);
+
+      sqlGetNetSales = await knex
+        .connect("transaction")
+        .sum("transactionAmountNett as nettAmount")
+        .sum("transactionServiceCharge as serviceCharge")
+        .sum("transactionDiscount as discount")
+        .sum("transactionTax as tax")
+        .whereBetween("transactionDatetime", [
+          getStartDate[0].shift_startDatetime,
+          getDateTime(),
+        ])
+        .andWhere("transactionStatusCode", 1)
+        .andWhere("transactionMethodCode", 1);
+
+      sqlRefund = await knex
+        .connect("transaction")
+        .sum("transactionAmountNett as amountRefund")
+        .whereBetween("transactionDatetime", [
+          getStartDate[0].shift_startDatetime,
+          getDateTime(),
+        ])
+        .andWhere("transactionStatusCode", 5)
+        .andWhere("transactionMethodCode", 1);
+
+      let deposit = totalAmountCash - getStartDate[0].shift_openTotalAmount;
       sql = await knex
         .connect("shift")
         .update({
           shiftCloseDenomination: cash_close,
           shiftEndDateTime: getDateTime(),
           shiftCloseTotalAmount: totalAmountCash,
-          shiftStatus : "Close"
+          shiftStatus: "Close",
+          shiftGrossSales:
+            sqlGetNetSales[0].nettAmount +
+            sqlRefund[0].amountRefund +
+            sqlGetNetSales[0].discount -
+            sqlGetNetSales[0].tax,
+          shiftRefunds: sqlRefund[0].amountRefund ? sqlRefund[0].amountRefund : 0,
+          shiftDiscount: sqlGetNetSales[0].discount ? sqlGetNetSales[0].discount : 0,
+          shiftNetSales: sqlGetNetSales[0].nettAmount ? sqlGetNetSales[0].nettAmount : 0,
+          shiftDeposit: deposit ? deposit : 0,
+          shiftTax: sqlGetNetSales[0].tax ? sqlGetNetSales[0].tax : 0,
+          shiftTotal: sqlGetNetSales[0].nettAmount + deposit,
         })
         .where("shiftId", shift_id);
     }
@@ -202,7 +247,14 @@ async function updateShift(shift_id, cash_open, type) {
         "shiftCloseDenomination as shift_closeDenomination",
         "shiftOpenTotalAmount as shift_totalAmount",
         "shiftCloseTotalAmount as shift_closeTotalAmount",
-        "shiftStatus as shift_status"
+        "shiftStatus as shift_status",
+        "shiftGrossSales as shift_grossSales",
+        "shiftRefunds as shift_refunds",
+        "shiftDiscount as shift_discount",
+        "shiftNetSales as shift_netSales",
+        "shiftDeposit as shift_deposit",
+        "shiftTax as shift_tax",
+        "shiftTotal as shift_total"
       )
       .where("shiftId", shift_id);
 
@@ -272,8 +324,83 @@ async function getShift(counter, staff_id, type) {
   return result;
 }
 
+async function getNetSales(start, end) {
+  let sql = null;
+  let result = null;
+  // start = "2022-09-12T21:31:10.000Z";
+  // end = "2022-09-14T21:43:17.000Z";
+
+  let startDate = moment(start).format("YYYY-MM-DD HH:mm:ss");
+  let endDate = moment(end).format("YYYY-MM-DD HH:mm:ss");
+
+  try {
+    // knex.raw("SUM(transactionAmountNett) as netAmount"),
+    // knex.raw("SUM(transactionServiceCharge) as serviceCharge"),
+    // knex.raw("SUM(transactionDiscount) as discount"),
+    // knex.raw("SUM(transactionTax) as tax"),
+    sql = await knex
+      .connect("transaction")
+      .sum("transactionAmountNett as nettAmount")
+      .sum("transactionServiceCharge as serviceCharge")
+      .sum("transactionDiscount as discount")
+      .sum("transactionTax as tax")
+      .whereBetween("transactionDatetime", [startDate, endDate])
+      .andWhere("transactionStatusCode", 1)
+      .andWhere("transactionMethodCode", 1);
+
+    console.log("sql", sql[0]);
+    if (!sql || sql.length == 0) {
+      result = false;
+    } else {
+      result = sql[0];
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
+async function getRefund(start, end) {
+  let sql = null;
+  let result = null;
+  // start = "2022-09-12T21:31:10.000Z";
+  // end = "2022-09-14T21:43:17.000Z";
+
+  let startDate = moment(start).format("YYYY-MM-DD HH:mm:ss");
+  let endDate = moment(end).format("YYYY-MM-DD HH:mm:ss");
+
+  console.log("startDate", startDate);
+  console.log("endDate", endDate);
+  try {
+    // knex.raw("SUM(transactionAmountNett) as netAmount"),
+    // knex.raw("SUM(transactionServiceCharge) as serviceCharge"),
+    // knex.raw("SUM(transactionDiscount) as discount"),
+    // knex.raw("SUM(transactionTax) as tax"),
+    sql = await knex
+      .connect("transaction")
+      .sum("transactionAmountNett as amountRefund")
+      .whereBetween("transactionDatetime", [startDate, endDate])
+      .andWhere("transactionStatusCode", 5)
+      .andWhere("transactionMethodCode", 1);
+
+    console.log("sqlrefund", sql);
+    if (!sql || sql.length == 0) {
+      result = false;
+    } else {
+      result = sql[0];
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+  return result;
+}
+
 module.exports = {
   insertShift,
   updateShift,
   getShift,
+  getNetSales,
+  getRefund,
 };
